@@ -28,9 +28,14 @@ jobs:
         uses: appleboy/ssh-action@master
         env:
           DB_ROOT: ${{ secrets.DB_CONNECT_ROOT }}
+          CLIENT_ID: ${{ secrets.MONEY_CLIENT_ID }}
         with:
           envs: GITHUB_SHA, GITHUB_REF, SERVICE, DB_ROOT
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.PRIVATE_KEY }}
-          script: sudo FACTER_image_tag=${GITHUB_SHA} FACTER_db_root=${DB_ROOT} /opt/puppetlabs/bin/puppet apply -t --tags gobackend::${SERVICE}::${GITHUB_REF##*/} /etc/puppetlabs/code/environments/production/manifests/site.pp; [[ "02" == *"${PIPESTATUS[0]}"* ]]
+          script: sudo 
+            FACTER_image_tag=${GITHUB_SHA} FACTER_db_root=${DB_ROOT} FACTER_client_id=${CLIENT_ID} 
+            /opt/puppetlabs/bin/puppet apply -t --tags gobackend::${SERVICE}::${GITHUB_REF##*/} 
+            /etc/puppetlabs/code/environments/production/manifests/site.pp; [[ "02" == *"${PIPESTATUS[0]}"* ]]
+       
