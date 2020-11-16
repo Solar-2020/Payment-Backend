@@ -30,7 +30,7 @@ jobs:
           DB_ROOT: ${{ secrets.DB_CONNECT_ROOT }}
           CLIENT_ID: ${{ secrets.MONEY_CLIENT_ID }}
         with:
-          envs: GITHUB_SHA, GITHUB_REF, SERVICE, DB_ROOT
+          envs: GITHUB_SHA, GITHUB_REF, SERVICE, DB_ROOT, CLIENT_ID
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.PRIVATE_KEY }}
