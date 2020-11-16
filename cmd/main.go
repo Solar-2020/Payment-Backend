@@ -47,7 +47,7 @@ func main() {
 		return
 	}
 
-	groupClient := group.NewClient(config.Config.GroupServiceAddress, config.Config.ServerSecret)
+	groupClient := group.NewClient(config.Config.GroupServiceHost, config.Config.ServerSecret)
 
 	errorWorker := errorWorker.NewErrorWorker()
 

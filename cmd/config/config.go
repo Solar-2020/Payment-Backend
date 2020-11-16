@@ -14,4 +14,7 @@ type config struct {
 	MoneyClientID                   string `envconfig:"MONEY_CLIENT_ID"`
 	MoneySuccessURL                 string `envconfig:"MONEY_SUCCESS_URL"`
 	MoneyFailURL                    string `envconfig:"MONEY_FAIL_URL"`
+	AuthServiceHost                 string `envconfig:"AUTH_SERVICE_HOST" default:"develop.pay-together.ru"`
+	GroupServiceHost                string `envconfig:"GROUP_SERVICE_HOST" default:"develop.pay-together.ru"`
+	AccountServiceHost              string `envconfig:"ACCOUNT_SERVICE_HOST" default:"develop.pay-together.ru"`
 }
