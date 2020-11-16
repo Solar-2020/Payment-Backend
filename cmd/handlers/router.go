@@ -11,7 +11,7 @@ func NewFastHttpRouter(payment paymentHandler.Handler, middleware Middleware) *f
 
 	router.PanicHandler = httputils.PanicHandler
 
-	router.Handle("GET", "/health", middleware.Log(httputils.HealthCheckHandler))
+	router.Handle("GET", "/health", httputils.HealthCheckHandler)
 
 	router.Handle("POST", "/api/payment/payment", middleware.Log(middleware.ExternalAuth(payment.Create)))
 	router.Handle("GET", "/api/payment/payment", middleware.Log(middleware.ExternalAuth(payment.GetByPostIDs)))
