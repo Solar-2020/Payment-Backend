@@ -20,7 +20,7 @@ func NewStorage(db *sql.DB) *storage {
 	}
 }
 
-func (s *storage) InsertPayments(payments []Payment, groupID, postID int) (err error) {
+func (s *storage) InsertPayments(payments []Payment, createBy, groupID, postID int) (err error) {
 	if len(payments) == 0 {
 		return
 	}
@@ -34,7 +34,7 @@ func (s *storage) InsertPayments(payments []Payment, groupID, postID int) (err e
 	sqlQuery := sqlQueryTemplate + s.createInsertQuery(len(payments), 5) + queryReturningID
 
 	for i, _ := range payments {
-		params = append(params, groupID, postID, payments[i].CreateBy, payments[i].TotalCost, payments[i].PaymentAccount)
+		params = append(params, groupID, postID, createBy, payments[i].TotalCost, payments[i].PaymentAccount)
 	}
 
 	for i := 1; i <= len(payments)*5; i++ {

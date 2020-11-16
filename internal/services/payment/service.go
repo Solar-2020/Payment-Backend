@@ -44,7 +44,7 @@ func (s *service) Create(createRequest CreateRequest) (createdPayments []payment
 		return createdPayments, errors.New("permission denied")
 	}
 
-	err = s.paymentStorage.InsertPayments(createRequest.Payments, createRequest.GroupID, createRequest.PostID)
+	err = s.paymentStorage.InsertPayments(createRequest.Payments, createRequest.CreateBy, createRequest.GroupID, createRequest.PostID)
 	if err != nil {
 		return
 	}

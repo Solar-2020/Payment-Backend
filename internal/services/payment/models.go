@@ -6,7 +6,7 @@ import (
 )
 
 type paymentStorage interface {
-	InsertPayments(payments []payment.Payment, groupID, postID int) (err error)
+	InsertPayments(payments []payment.Payment, createBy, groupID, postID int) (err error)
 	SelectPaymentsByPostsIDs(postIDs []int) (payments []payment.Payment, err error)
 	SelectPaymentsByPostID(postID int)(payments []payment.Payment, err error)
 	SelectPayment(paymentID int) (payment payment.Payment, err error)
