@@ -1,10 +1,10 @@
 name: Docker Build
 env:
-  SERVICE: 'group'
+  SERVICE: 'payments'
 
 on:
   push:
-    branches: [ main, dev, predev ]
+    branches: [ main, dev ]
 
 jobs:
   build:
@@ -15,8 +15,6 @@ jobs:
         run: echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
       - name: Branch name
         run: echo running on branch ${GITHUB_REF##*/}
-      - name: Pregen code
-        run: chmod +x scripts/change_mods.sh && ./scripts/change_mods.sh ${GITHUB_REF##*/}
       - name: Build Docker image
         run: docker build -t tamerlanchik/solar_${SERVICE}_${GITHUB_REF##*/}:${GITHUB_SHA}  -t tamerlanchik/solar_${SERVICE}_${GITHUB_REF##*/}:latest .
       - name: Push the image
