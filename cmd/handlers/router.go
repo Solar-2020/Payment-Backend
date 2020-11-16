@@ -13,9 +13,11 @@ func NewFastHttpRouter(payment paymentHandler.Handler, middleware Middleware) *f
 
 	router.Handle("GET", "/health", httputils.HealthCheckHandler)
 
-	router.Handle("POST", "/api/payment/payment", middleware.Log(middleware.ExternalAuth(payment.Create)))
-	router.Handle("GET", "/api/payment/payment", middleware.Log(middleware.ExternalAuth(payment.GetByPostIDs)))
-	router.Handle("POST", "/api/payment/pay", middleware.Log(middleware.ExternalAuth(payment.Pay)))
+	//router.Handle("POST", "/api/payment/pay", middleware.Log(middleware.ExternalAuth(payment.Pay)))
+	router.Handle("POST", "/api/payment/pay", payment.Pay)
+
+	router.Handle("POST", "/api/internal/payment/payment", middleware.Log(middleware.InternalAuth(payment.Create)))
+	router.Handle("POST", "/api/internal/payment/by-post-ids", middleware.Log(middleware.InternalAuth(payment.GetByPostIDs)))
 
 	return router
 }

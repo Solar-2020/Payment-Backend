@@ -41,7 +41,11 @@ func main() {
 	postsDB.SetMaxIdleConns(5)
 	postsDB.SetMaxOpenConns(10)
 
-	moneyClient := money.NewClient(config.Config.MoneyClientID, config.Config.MoneySuccessURL, config.Config.MoneyFailURL)
+	moneyClient, err := money.NewClient(config.Config.MoneyClientID, config.Config.MoneySuccessURL, config.Config.MoneyFailURL)
+	if err!= nil {
+		log.Fatal().Msg(err.Error())
+		return
+	}
 
 	groupClient := group.NewClient(config.Config.GroupServiceAddress, config.Config.ServerSecret)
 

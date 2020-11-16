@@ -10,17 +10,11 @@ const (
 	queryReturningID = "RETURNING id;"
 )
 
-type Storage interface {
-	InsertPayments(payments []Payment, groupID, postID int) (err error)
-	SelectPayments(postIDs []int) (payments []Payment, err error)
-	SelectPayment(paymentID int) (payment Payment, err error)
-}
-
 type storage struct {
 	db *sql.DB
 }
 
-func NewStorage(db *sql.DB) Storage {
+func NewStorage(db *sql.DB) *storage {
 	return &storage{
 		db: db,
 	}
@@ -32,18 +26,18 @@ func (s *storage) InsertPayments(payments []Payment, groupID, postID int) (err e
 	}
 
 	const sqlQueryTemplate = `
-	INSERT INTO payments(group_id, post_id, create_by, total_cost, payment_account)
+	INSERT INTO payment(group_id, post_id, create_by, total_cost, payment_account)
 	VALUES `
 
 	var params []interface{}
 
-	sqlQuery := sqlQueryTemplate + s.createInsertQuery(len(payments), 4) + queryReturningID
+	sqlQuery := sqlQueryTemplate + s.createInsertQuery(len(payments), 5) + queryReturningID
 
 	for i, _ := range payments {
 		params = append(params, groupID, postID, payments[i].CreateBy, payments[i].TotalCost, payments[i].PaymentAccount)
 	}
 
-	for i := 1; i <= len(payments)*4; i++ {
+	for i := 1; i <= len(payments)*5; i++ {
 		sqlQuery = strings.Replace(sqlQuery, "?", "$"+strconv.Itoa(i), 1)
 	}
 
@@ -52,14 +46,14 @@ func (s *storage) InsertPayments(payments []Payment, groupID, postID int) (err e
 	return
 }
 
-func (s *storage) SelectPayments(postIDs []int) (payments []Payment, err error) {
+func (s *storage) SelectPaymentsByPostsIDs(postIDs []int) (payments []Payment, err error) {
 	payments = make([]Payment, 0)
 	if len(postIDs) == 0 {
 		return
 	}
 	const sqlQueryTemplate = `
-	SELECT p.id, p.total_cost, p.group_id, p.post_id
-	FROM payments AS p
+	SELECT p.id, p.total_cost, p.payment_account, p.create_by, p.group_id, p.post_id
+	FROM payment AS p
 	WHERE p.post_id IN `
 
 	sqlQuery := sqlQueryTemplate + createIN(len(postIDs))
@@ -82,7 +76,7 @@ func (s *storage) SelectPayments(postIDs []int) (payments []Payment, err error) 
 
 	for rows.Next() {
 		var tempPayment Payment
-		err = rows.Scan(&tempPayment.ID, &tempPayment.TotalCost, &tempPayment.GroupID, &tempPayment.PostID)
+		err = rows.Scan(&tempPayment.ID, &tempPayment.TotalCost, &tempPayment.PaymentAccount, &tempPayment.CreateBy, &tempPayment.GroupID, &tempPayment.PostID)
 		if err != nil {
 			return
 		}
@@ -92,13 +86,19 @@ func (s *storage) SelectPayments(postIDs []int) (payments []Payment, err error) 
 	return
 }
 
+func (s *storage) SelectPaymentsByPostID(postID int) (payments []Payment, err error) {
+	postsIDs := make([]int, 1)
+	postsIDs = append(postsIDs, postID)
+	return s.SelectPaymentsByPostsIDs(postsIDs)
+}
+
 func (s *storage) SelectPayment(paymentID int) (payment Payment, err error) {
 	const sqlQuery = `
-	SELECT p.id, p.total_cost, p.group_id, p.post_id
-	FROM payments AS p
+	SELECT p.id, p.total_cost, p.payment_account, p.group_id, p.post_id
+	FROM payment AS p
 	WHERE p.id = $1;`
 
-	err = s.db.QueryRow(sqlQuery, paymentID).Scan(&payment.ID, &payment.TotalCost, &payment.GroupID, &payment.PostID)
+	err = s.db.QueryRow(sqlQuery, paymentID).Scan(&payment.ID, &payment.TotalCost, &payment.PaymentAccount, &payment.GroupID, &payment.PostID)
 
 	return
 }

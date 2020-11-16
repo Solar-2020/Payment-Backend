@@ -15,19 +15,13 @@ var (
 	moneyAccountNumberLength       = 15
 )
 
-type Service interface {
-	Create(createRequest CreateRequest) (createdPayments []payment.Payment, err error)
-	GetByPostIDs(postIDs []int) (payments []payment.Payment, err error)
-	Pay(pay Pay) (paymentPage money.PaymentPage, err error)
-}
-
 type service struct {
 	paymentStorage paymentStorage
-	moneyClient    money.Client
+	moneyClient    moneyClient
 	groupClient    group.Client
 }
 
-func NewService(paymentStorage paymentStorage, moneyClient money.Client, groupClient group.Client) Service {
+func NewService(paymentStorage paymentStorage, moneyClient moneyClient, groupClient group.Client) *service {
 	return &service{
 		paymentStorage: paymentStorage,
 		moneyClient:    moneyClient,
@@ -55,11 +49,11 @@ func (s *service) Create(createRequest CreateRequest) (createdPayments []payment
 		return
 	}
 
-	return
+	return s.paymentStorage.SelectPaymentsByPostID(createRequest.PostID)
 }
 
 func (s *service) GetByPostIDs(postIDs []int) (payments []payment.Payment, err error) {
-	payments, err = s.paymentStorage.SelectPayments(postIDs)
+	payments, err = s.paymentStorage.SelectPaymentsByPostsIDs(postIDs)
 	if err != nil {
 		return
 	}

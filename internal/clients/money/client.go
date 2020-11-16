@@ -7,12 +7,6 @@ import (
 	"net/url"
 )
 
-type Client interface {
-	GetInstanceID() (instanceID string, err error)
-	CreatePayment(yandexPayment Payment) (requestID string, err error)
-	CreatePaymentURL(requestID string) (paymentPage PaymentPage, err error)
-}
-
 type client struct {
 	clientID   string
 	instanceID string
@@ -20,8 +14,13 @@ type client struct {
 	failURL    string
 }
 
-func NewClient(clientID, successURL, failURL string) Client {
-	return &client{clientID: clientID, successURL: successURL, failURL: failURL}
+func NewClient(clientID, successURL, failURL string) (newClient *client, err error) {
+	newClient = &client{clientID: clientID, successURL: successURL, failURL: failURL}
+	newClient.instanceID, err = newClient.GetInstanceID()
+	if err != nil {
+		return
+	}
+	return
 }
 
 func (c *client) GetInstanceID() (instanceID string, err error) {
@@ -34,8 +33,12 @@ func (c *client) GetInstanceID() (instanceID string, err error) {
 	req.URI().SetHost("money.yandex.ru")
 	req.URI().SetPath("api/instance-id")
 
+	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	req.Header.SetMethod(fasthttp.MethodPost)
+
 	data := url.Values{}
 	data.Set("client_id", c.clientID)
+	req.SetBodyString(data.Encode())
 
 	err = fasthttp.Do(req, resp)
 	if err != nil {
@@ -75,12 +78,16 @@ func (c *client) CreatePayment(yandexPayment Payment) (requestID string, err err
 	req.URI().SetHost("money.yandex.ru")
 	req.URI().SetPath("api/request-external-payment")
 
+	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	req.Header.SetMethod(fasthttp.MethodPost)
+
 	data := url.Values{}
 	data.Set("pattern_id", "p2p")
 	data.Set("instance_id", c.instanceID)
 	data.Set("to", yandexPayment.To)
 	data.Set("amount_due", yandexPayment.AmountDue.String())
 	data.Set("message", yandexPayment.Message)
+	req.SetBodyString(data.Encode())
 
 	err = fasthttp.Do(req, resp)
 	if err != nil {
@@ -120,12 +127,16 @@ func (c *client) CreatePaymentURL(requestID string) (paymentPage PaymentPage, er
 	req.URI().SetHost("money.yandex.ru")
 	req.URI().SetPath("api/process-external-payment")
 
+	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	req.Header.SetMethod(fasthttp.MethodPost)
+
 	data := url.Values{}
 	data.Set("request_id", requestID)
 	data.Set("instance_id", c.instanceID)
 	data.Set("ext_auth_success_uri", c.successURL)
 	data.Set("ext_auth_fail_uri", c.failURL)
 	data.Set("request_token", "true")
+	req.SetBodyString(data.Encode())
 
 	err = fasthttp.Do(req, resp)
 	if err != nil {
@@ -148,7 +159,7 @@ func (c *client) CreatePaymentURL(requestID string) (paymentPage PaymentPage, er
 			return
 		}
 
-		if response.Status != "success" {
+		if response.Status != "ext_auth_required" {
 			return paymentPage, errors.New(response.Error)
 		}
 

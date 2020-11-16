@@ -3,7 +3,7 @@ package group
 import (
 	"encoding/json"
 	"errors"
-	"net/http"
+	"github.com/valyala/fasthttp"
 	"strconv"
 	"strings"
 )
@@ -33,32 +33,33 @@ type UserRole struct {
 }
 
 func (c *client) GetUserRole(userID, groupID int) (roleID int, err error) {
+	req := fasthttp.AcquireRequest()
+	resp := fasthttp.AcquireResponse()
+	defer fasthttp.ReleaseRequest(req)
+	defer fasthttp.ReleaseResponse(resp)
 
-	req, err := http.NewRequest(http.MethodGet, c.host+"/api/internal/group/permission", nil)
-	if err != nil {
-		return
-	}
-	q := req.URL.Query()
-	q.Add("user_id", strconv.Itoa(userID))
-	q.Add("group_id", strconv.Itoa(groupID))
-	req.URL.RawQuery = q.Encode()
+	req.URI().SetScheme("http")
+	req.URI().SetHost(c.host)
+	req.URI().SetPath("api/internal/group/permission")
+
+	req.URI().QueryArgs().Add("user_id", strconv.Itoa(userID))
+	req.URI().QueryArgs().Add("group_id", strconv.Itoa(groupID))
+
 	req.Header.Set("Authorization", c.secret)
 
-	resp, err := http.DefaultClient.Do(req)
+	err = fasthttp.Do(req, resp)
 	if err != nil {
 		return
 	}
 
-	defer resp.Body.Close()
-
-	switch resp.StatusCode {
-	case http.StatusOK:
+	switch resp.StatusCode() {
+	case fasthttp.StatusOK:
 		var response UserRole
-		err = json.NewDecoder(resp.Body).Decode(&response)
+		err = json.Unmarshal(resp.Body(), &response)
 		return response.RoleID, err
-	case http.StatusBadRequest:
+	case fasthttp.StatusBadRequest:
 		var httpErr httpError
-		err = json.NewDecoder(resp.Body).Decode(&httpErr)
+		err = json.Unmarshal(resp.Body(), &httpErr)
 		if err != nil {
 			return
 		}
