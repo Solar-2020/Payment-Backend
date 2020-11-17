@@ -88,9 +88,9 @@ func (s *service) Pay(pay Pay) (paymentPage money.PaymentPage, err error) {
 
 func (s *service) validateCreate(payments []payment.Payment) (err error) {
 	for _, payment := range payments {
-		if len(payment.PaymentAccount) != moneyAccountNumberLength {
-			return errors.New("Неверный номер кошелька")
-		}
+		//if len(payment.PaymentAccount) != moneyAccountNumberLength {
+		//	return errors.New("Неверный номер кошелька")
+		//}
 
 		if payment.TotalCost.GreaterThan(decimal.NewFromInt(maxTotalCost)) || payment.TotalCost.LessThan(decimal.NewFromInt(minTotalCost)) {
 			return errors.New("Недопустимое значение суммы оплаты")
