@@ -2,7 +2,7 @@ package payment
 
 import (
 	"github.com/Solar-2020/Payment-Backend/internal/clients/money"
-	payment "github.com/Solar-2020/Payment-Backend/internal/storages/paymentStorage"
+	"github.com/Solar-2020/Payment-Backend/pkg/models"
 )
 
 const (
@@ -13,10 +13,10 @@ const (
 )
 
 type paymentStorage interface {
-	InsertPayments(payments []payment.Payment, createBy, groupID, postID int) (err error)
-	SelectPaymentsByPostsIDs(postIDs []int) (payments []payment.Payment, err error)
-	SelectPaymentsByPostID(postID int) (payments []payment.Payment, err error)
-	SelectPayment(paymentID int) (payment payment.Payment, err error)
+	InsertPayments(payments []models.Payment, createBy, groupID, postID int) (err error)
+	SelectPaymentsByPostsIDs(postIDs []int) (payments []models.Payment, err error)
+	SelectPaymentsByPostID(postID int) (payments []models.Payment, err error)
+	SelectPayment(paymentID int) (payment models.Payment, err error)
 }
 
 type moneyClient interface {
@@ -31,13 +31,6 @@ type groupClient interface {
 
 type errorWorker interface {
 	NewError(httpCode int, responseError error, fullError error) (err error)
-}
-
-type CreateRequest struct {
-	CreateBy int               `json:"createBy"`
-	GroupID  int               `json:"groupID"`
-	PostID   int               `json:"postID"`
-	Payments []payment.Payment `json:"payments"`
 }
 
 type Pay struct {

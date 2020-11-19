@@ -7,6 +7,7 @@ import (
 	group "github.com/Solar-2020/Group-Backend/pkg/client"
 	"github.com/Solar-2020/Payment-Backend/cmd/config"
 	"github.com/Solar-2020/Payment-Backend/cmd/handlers"
+	"github.com/Solar-2020/Payment-Backend/cmd/handlers/middleware"
 	paymentHandler "github.com/Solar-2020/Payment-Backend/cmd/handlers/payment"
 	"github.com/Solar-2020/Payment-Backend/internal/clients/money"
 	"github.com/Solar-2020/Payment-Backend/internal/services/payment"
@@ -58,7 +59,7 @@ func main() {
 
 	authClient := auth.NewClient(config.Config.AuthServiceAddress, config.Config.ServerSecret)
 
-	middlewares := handlers.NewMiddleware(&log, authClient)
+	middlewares := middleware.NewMiddleware(&log, authClient)
 
 	server := fasthttp.Server{
 		Handler: handlers.NewFastHttpRouter(paymentHandler, middlewares).Handler,

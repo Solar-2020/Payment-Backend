@@ -2,7 +2,7 @@ package payment
 
 import (
 	"github.com/Solar-2020/Payment-Backend/internal/clients/money"
-	payment "github.com/Solar-2020/Payment-Backend/internal/storages/paymentStorage"
+	"github.com/Solar-2020/Payment-Backend/pkg/models"
 	"github.com/valyala/fasthttp"
 )
 
@@ -28,7 +28,7 @@ func NewService(paymentStorage paymentStorage, moneyClient moneyClient, groupCli
 	}
 }
 
-func (s *service) Create(createRequest CreateRequest) (createdPayments []payment.Payment, err error) {
+func (s *service) Create(createRequest models.CreateRequest) (createdPayments []models.Payment, err error) {
 	if err = s.validateCreate(createRequest.Payments); err != nil {
 		return
 	}
@@ -52,7 +52,7 @@ func (s *service) Create(createRequest CreateRequest) (createdPayments []payment
 	return
 }
 
-func (s *service) GetByPostIDs(postIDs []int) (payments []payment.Payment, err error) {
+func (s *service) GetByPostIDs(postIDs []int) (payments []models.Payment, err error) {
 	payments, err = s.paymentStorage.SelectPaymentsByPostsIDs(postIDs)
 	if err != nil {
 		err = s.errorWorker.NewError(fasthttp.StatusInternalServerError, nil, err)
@@ -86,15 +86,15 @@ func (s *service) Pay(pay Pay) (paymentPage money.PaymentPage, err error) {
 	return
 }
 
-func (s *service) validateCreate(payments []payment.Payment) (err error) {
+func (s *service) validateCreate(payments []models.Payment) (err error) {
 	//for _, payment := range payments {
-		//if len(payment.PaymentAccount) != moneyAccountNumberLength {
-		//	return errors.New("Неверный номер кошелька")
-		//}
-
-		//if payment.TotalCost.GreaterThan(decimal.NewFromInt(maxTotalCost)) || payment.TotalCost.LessThan(decimal.NewFromInt(minTotalCost)) {
-		//	return errors.New("Недопустимое значение суммы оплаты")
-		//}
+	//	//if len(payment.PaymentAccount) != moneyAccountNumberLength {
+	//	//	return errors.New("Неверный номер кошелька")
+	//	//}
+	//
+	//	//if payment.TotalCost.GreaterThan(decimal.NewFromInt(maxTotalCost)) || payment.TotalCost.LessThan(decimal.NewFromInt(minTotalCost)) {
+	//	//	return errors.New("Недопустимое значение суммы оплаты")
+	//	//}
 	//}
 
 	return

@@ -2,6 +2,7 @@ package paymentStorage
 
 import (
 	"database/sql"
+	"github.com/Solar-2020/Payment-Backend/pkg/models"
 	"strconv"
 	"strings"
 )
@@ -20,7 +21,7 @@ func NewStorage(db *sql.DB) *storage {
 	}
 }
 
-func (s *storage) InsertPayments(payments []Payment, createBy, groupID, postID int) (err error) {
+func (s *storage) InsertPayments(payments []models.Payment, createBy, groupID, postID int) (err error) {
 	if len(payments) == 0 {
 		return
 	}
@@ -46,8 +47,8 @@ func (s *storage) InsertPayments(payments []Payment, createBy, groupID, postID i
 	return
 }
 
-func (s *storage) SelectPaymentsByPostsIDs(postIDs []int) (payments []Payment, err error) {
-	payments = make([]Payment, 0)
+func (s *storage) SelectPaymentsByPostsIDs(postIDs []int) (payments []models.Payment, err error) {
+	payments = make([]models.Payment, 0)
 	if len(postIDs) == 0 {
 		return
 	}
@@ -75,7 +76,7 @@ func (s *storage) SelectPaymentsByPostsIDs(postIDs []int) (payments []Payment, e
 	defer rows.Close()
 
 	for rows.Next() {
-		var tempPayment Payment
+		var tempPayment models.Payment
 		err = rows.Scan(&tempPayment.ID, &tempPayment.TotalCost, &tempPayment.PaymentAccount, &tempPayment.CreateBy, &tempPayment.GroupID, &tempPayment.PostID)
 		if err != nil {
 			return
@@ -86,13 +87,13 @@ func (s *storage) SelectPaymentsByPostsIDs(postIDs []int) (payments []Payment, e
 	return
 }
 
-func (s *storage) SelectPaymentsByPostID(postID int) (payments []Payment, err error) {
+func (s *storage) SelectPaymentsByPostID(postID int) (payments []models.Payment, err error) {
 	postsIDs := make([]int, 1)
 	postsIDs = append(postsIDs, postID)
 	return s.SelectPaymentsByPostsIDs(postsIDs)
 }
 
-func (s *storage) SelectPayment(paymentID int) (payment Payment, err error) {
+func (s *storage) SelectPayment(paymentID int) (payment models.Payment, err error) {
 	const sqlQuery = `
 	SELECT p.id, p.total_cost, p.payment_account, p.group_id, p.post_id
 	FROM payment AS p

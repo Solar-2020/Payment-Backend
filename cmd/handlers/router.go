@@ -2,11 +2,12 @@ package handlers
 
 import (
 	httputils "github.com/Solar-2020/GoUtils/http"
+	"github.com/Solar-2020/Payment-Backend/cmd/handlers/middleware"
 	paymentHandler "github.com/Solar-2020/Payment-Backend/cmd/handlers/payment"
 	"github.com/buaazp/fasthttprouter"
 )
 
-func NewFastHttpRouter(payment paymentHandler.Handler, middleware Middleware) *fasthttprouter.Router {
+func NewFastHttpRouter(payment paymentHandler.Handler, middleware middleware.Middleware) *fasthttprouter.Router {
 	router := fasthttprouter.New()
 
 	router.PanicHandler = httputils.PanicHandler

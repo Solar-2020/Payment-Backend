@@ -3,7 +3,7 @@ package payment
 import (
 	"encoding/json"
 	"github.com/Solar-2020/Payment-Backend/internal/clients/money"
-	payment "github.com/Solar-2020/Payment-Backend/internal/storages/paymentStorage"
+	"github.com/Solar-2020/Payment-Backend/pkg/models"
 	"github.com/valyala/fasthttp"
 )
 
@@ -14,13 +14,13 @@ func NewTransport() *transport {
 	return &transport{}
 }
 
-func (t transport) CreateDecode(ctx *fasthttp.RequestCtx) (payments CreateRequest, err error) {
+func (t transport) CreateDecode(ctx *fasthttp.RequestCtx) (payments models.CreateRequest, err error) {
 	err = json.Unmarshal(ctx.Request.Body(), &payments)
 
 	return
 }
 
-func (t transport) CreateEncode(ctx *fasthttp.RequestCtx, payments []payment.Payment) (err error) {
+func (t transport) CreateEncode(ctx *fasthttp.RequestCtx, payments []models.Payment) (err error) {
 	body, err := json.Marshal(payments)
 	if err != nil {
 		return
@@ -43,7 +43,7 @@ func (t transport) GetByPostIDsDecode(ctx *fasthttp.RequestCtx) (postIDs []int, 
 	return ids.PostIDs, err
 }
 
-func (t transport) GetByPostIDsEncode(payments []payment.Payment, ctx *fasthttp.RequestCtx) (err error) {
+func (t transport) GetByPostIDsEncode(payments []models.Payment, ctx *fasthttp.RequestCtx) (err error) {
 	body, err := json.Marshal(payments)
 	if err != nil {
 		return
