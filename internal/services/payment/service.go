@@ -1,12 +1,9 @@
 package payment
 
 import (
-	"errors"
-	"fmt"
-	"github.com/Solar-2020/Payment-Backend/internal/clients/group"
 	"github.com/Solar-2020/Payment-Backend/internal/clients/money"
 	payment "github.com/Solar-2020/Payment-Backend/internal/storages/paymentStorage"
-	"github.com/shopspring/decimal"
+	"github.com/valyala/fasthttp"
 )
 
 var (
@@ -18,14 +15,16 @@ var (
 type service struct {
 	paymentStorage paymentStorage
 	moneyClient    moneyClient
-	groupClient    group.Client
+	groupClient    groupClient
+	errorWorker    errorWorker
 }
 
-func NewService(paymentStorage paymentStorage, moneyClient moneyClient, groupClient group.Client) *service {
+func NewService(paymentStorage paymentStorage, moneyClient moneyClient, groupClient groupClient, errorWorker errorWorker) *service {
 	return &service{
 		paymentStorage: paymentStorage,
 		moneyClient:    moneyClient,
 		groupClient:    groupClient,
+		errorWorker:    errorWorker,
 	}
 }
 
@@ -34,28 +33,29 @@ func (s *service) Create(createRequest CreateRequest) (createdPayments []payment
 		return
 	}
 
-	roleID, err := s.groupClient.GetUserRole(createRequest.CreateBy, createRequest.GroupID)
+	err = s.groupClient.CheckPermission(createRequest.CreateBy, createRequest.GroupID, CreatePaymentActionID)
 	if err != nil {
-		err = fmt.Errorf("restricted")
 		return
-	}
-
-	if roleID > 2 {
-		return createdPayments, errors.New("permission denied")
 	}
 
 	err = s.paymentStorage.InsertPayments(createRequest.Payments, createRequest.CreateBy, createRequest.GroupID, createRequest.PostID)
 	if err != nil {
+		err = s.errorWorker.NewError(fasthttp.StatusInternalServerError, nil, err)
 		return
 	}
 
-	return s.paymentStorage.SelectPaymentsByPostID(createRequest.PostID)
+	createdPayments, err = s.paymentStorage.SelectPaymentsByPostID(createRequest.PostID)
+	if err != nil {
+		err = s.errorWorker.NewError(fasthttp.StatusInternalServerError, nil, err)
+	}
+
+	return
 }
 
 func (s *service) GetByPostIDs(postIDs []int) (payments []payment.Payment, err error) {
 	payments, err = s.paymentStorage.SelectPaymentsByPostsIDs(postIDs)
 	if err != nil {
-		return
+		err = s.errorWorker.NewError(fasthttp.StatusInternalServerError, nil, err)
 	}
 
 	return
@@ -64,7 +64,7 @@ func (s *service) GetByPostIDs(postIDs []int) (payments []payment.Payment, err e
 func (s *service) Pay(pay Pay) (paymentPage money.PaymentPage, err error) {
 	payment, err := s.paymentStorage.SelectPayment(pay.PaymentID)
 	if err != nil {
-		return paymentPage, err
+		return paymentPage, s.errorWorker.NewError(fasthttp.StatusInternalServerError, nil, err)
 	}
 
 	yandexPayment := money.Payment{
@@ -75,27 +75,27 @@ func (s *service) Pay(pay Pay) (paymentPage money.PaymentPage, err error) {
 
 	requestID, err := s.moneyClient.CreatePayment(yandexPayment)
 	if err != nil {
-		return paymentPage, err
+		return paymentPage, s.errorWorker.NewError(fasthttp.StatusInternalServerError, nil, err)
 	}
 
 	paymentPage, err = s.moneyClient.CreatePaymentURL(requestID)
 	if err != nil {
-		return paymentPage, err
+		return paymentPage, s.errorWorker.NewError(fasthttp.StatusInternalServerError, nil, err)
 	}
 
 	return
 }
 
 func (s *service) validateCreate(payments []payment.Payment) (err error) {
-	for _, payment := range payments {
+	//for _, payment := range payments {
 		//if len(payment.PaymentAccount) != moneyAccountNumberLength {
 		//	return errors.New("Неверный номер кошелька")
 		//}
 
-		if payment.TotalCost.GreaterThan(decimal.NewFromInt(maxTotalCost)) || payment.TotalCost.LessThan(decimal.NewFromInt(minTotalCost)) {
-			return errors.New("Недопустимое значение суммы оплаты")
-		}
-	}
+		//if payment.TotalCost.GreaterThan(decimal.NewFromInt(maxTotalCost)) || payment.TotalCost.LessThan(decimal.NewFromInt(minTotalCost)) {
+		//	return errors.New("Недопустимое значение суммы оплаты")
+		//}
+	//}
 
 	return
 }
