@@ -2,6 +2,7 @@ package paymentStorage
 
 import (
 	"database/sql"
+	models2 "github.com/Solar-2020/Payment-Backend/internal/models"
 	"github.com/Solar-2020/Payment-Backend/pkg/models"
 	"strconv"
 	"strings"
@@ -101,6 +102,81 @@ func (s *storage) SelectPayment(paymentID int) (payment models.Payment, err erro
 
 	err = s.db.QueryRow(sqlQuery, paymentID).Scan(&payment.ID, &payment.TotalCost, &payment.PaymentAccount, &payment.GroupID, &payment.PostID)
 
+	return
+}
+
+func (s *storage) SelectPaids(paymentID int) (paids []models2.Paid, err error) {
+	const sqlQuery = `
+	SELECT p.id, p.user_id, p.cost, p.paid_at, p.requisite_type_id, p.requisite_id
+	FROM paid AS p
+	WHERE p.payment_id = $1;`
+
+	rows, err := s.db.Query(sqlQuery, paymentID)
+	if err != nil {
+		return
+	}
+
+	for rows.Next() {
+		var tempPaid models2.Paid
+		err = rows.Scan(&tempPaid.PaidID, &tempPaid.PayerID, &tempPaid.Cost, &tempPaid.PaidAt, &tempPaid.RequisiteType, &tempPaid.RequisiteID)
+		if err != nil {
+			return
+		}
+		paids = append(paids, tempPaid)
+	}
+
+	for i, _ := range paids {
+		switch paids[i].RequisiteType {
+		case 1:
+			bankCard, err := s.selectBankRequisite(paids[i].RequisiteID)
+			if err != nil {
+				return
+			}
+			paids[i].BankCard = &bankCard
+		case 2:
+			phonePayment, err := s.selectPhoneRequisite(paids[i].RequisiteID)
+			if err != nil {
+				return
+			}
+			paids[i].PhonePayment = &phonePayment
+		case 3:
+			youMoneyAccount, err := s.selectYouMoneyRequisite(paids[i].RequisiteID)
+			if err != nil {
+				return
+			}
+			paids[i].YouMoneyAccount = &youMoneyAccount
+		}
+	}
+	return
+}
+
+func (s *storage) selectBankRequisite(bankRequisiteID int) (bankCard models2.BankCard, err error) {
+	const sqlQuery = `
+	SELECT bc.id, bc.bank_title, bc.phone_number, bc.card_number, bc.owner
+	FROM bank_card AS bc
+	WHERE bc.id = $1;`
+
+	err = s.db.QueryRow(sqlQuery, bankRequisiteID).Scan(&bankCard.ID, &bankCard.BankTitle, &bankCard.PhoneNumber, &bankCard.CardNumber, &bankCard.Owner)
+	return
+}
+
+func (s *storage) selectPhoneRequisite(bankRequisiteID int) (phonePayment models2.PhonePayment, err error) {
+	const sqlQuery = `
+	SELECT pp.id, pp.phone_number, pp.owner
+	FROM phone_payment AS pp
+	WHERE pp.id = $1;`
+
+	err = s.db.QueryRow(sqlQuery, bankRequisiteID).Scan(&phonePayment.ID, &phonePayment.PhoneNumber, &phonePayment.Owner)
+	return
+}
+
+func (s *storage) selectYouMoneyRequisite(bankRequisiteID int) (youMoneyAccount models2.YouMoneyAccount, err error) {
+	const sqlQuery = `
+	SELECT ya.id, ya.account_number, ya.owner
+	FROM yoomoney_account AS ya
+	WHERE ya.id = $1;`
+
+	err = s.db.QueryRow(sqlQuery, bankRequisiteID).Scan(&youMoneyAccount.ID, &youMoneyAccount.AccountNumber, &youMoneyAccount.Owner)
 	return
 }
 

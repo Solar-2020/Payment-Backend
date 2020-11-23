@@ -1,7 +1,9 @@
 package payment
 
 import (
+	account "github.com/Solar-2020/Account-Backend/pkg/models"
 	"github.com/Solar-2020/Payment-Backend/internal/clients/money"
+	models2 "github.com/Solar-2020/Payment-Backend/internal/models"
 	"github.com/Solar-2020/Payment-Backend/pkg/models"
 )
 
@@ -10,6 +12,8 @@ const (
 	CreatePaymentActionID = 10
 	EditPaymentActionID   = 11
 	DeletePaymentActionID = 12
+
+	Error
 )
 
 type paymentStorage interface {
@@ -17,6 +21,7 @@ type paymentStorage interface {
 	SelectPaymentsByPostsIDs(postIDs []int) (payments []models.Payment, err error)
 	SelectPaymentsByPostID(postID int) (payments []models.Payment, err error)
 	SelectPayment(paymentID int) (payment models.Payment, err error)
+	SelectPaids(paymentID int) (paids []models2.Paid, err error)
 }
 
 type moneyClient interface {
@@ -27,6 +32,10 @@ type moneyClient interface {
 
 type groupClient interface {
 	CheckPermission(userID, groupId, actionID int) (err error)
+}
+
+type accountBackend interface {
+	GetUserByUid(userID int) (user account.User, err error)
 }
 
 type errorWorker interface {

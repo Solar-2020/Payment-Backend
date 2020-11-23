@@ -1,7 +1,9 @@
 package payment
 
 import (
+	"database/sql"
 	"github.com/Solar-2020/Payment-Backend/internal/clients/money"
+	models2 "github.com/Solar-2020/Payment-Backend/internal/models"
 	"github.com/Solar-2020/Payment-Backend/pkg/models"
 	"github.com/valyala/fasthttp"
 )
@@ -16,14 +18,16 @@ type service struct {
 	paymentStorage paymentStorage
 	moneyClient    moneyClient
 	groupClient    groupClient
+	accountBackend accountBackend
 	errorWorker    errorWorker
 }
 
-func NewService(paymentStorage paymentStorage, moneyClient moneyClient, groupClient groupClient, errorWorker errorWorker) *service {
+func NewService(paymentStorage paymentStorage, moneyClient moneyClient, groupClient groupClient, accountBackend accountBackend, errorWorker errorWorker) *service {
 	return &service{
 		paymentStorage: paymentStorage,
 		moneyClient:    moneyClient,
 		groupClient:    groupClient,
+		accountBackend: accountBackend,
 		errorWorker:    errorWorker,
 	}
 }
@@ -96,6 +100,30 @@ func (s *service) validateCreate(payments []models.Payment) (err error) {
 	//	//	return errors.New("Недопустимое значение суммы оплаты")
 	//	//}
 	//}
+
+	return
+}
+
+func (s *service) Stats(paymentID int) (stats []models2.Stat, err error) {
+	stats = make([]models2.Stat, 0)
+	paids, err := s.paymentStorage.SelectPaids(paymentID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return stats, nil
+		}
+		return stats, s.errorWorker.NewError(fasthttp.StatusInternalServerError, nil, err)
+	}
+
+	stats = make([]models2.Stat, len(paids))
+	for _, paid := range paids {
+		var tempStat models2.Stat
+		tempStat.Paid = paid
+		tempStat.Payer, err = s.accountBackend.GetUserByUid(tempStat.PayerID)
+		if err != nil {
+			return stats, s.errorWorker.NewError(fasthttp.StatusInternalServerError, nil, err)
+		}
+		stats = append(stats, tempStat)
+	}
 
 	return
 }

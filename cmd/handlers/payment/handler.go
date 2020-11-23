@@ -8,6 +8,7 @@ type Handler interface {
 	Create(ctx *fasthttp.RequestCtx)
 	GetByPostIDs(ctx *fasthttp.RequestCtx)
 	Pay(ctx *fasthttp.RequestCtx)
+	Stats(ctx *fasthttp.RequestCtx)
 }
 
 type handler struct {
@@ -78,6 +79,26 @@ func (h *handler) Pay(ctx *fasthttp.RequestCtx) {
 	}
 
 	err = h.paymentTransport.PayEncode(paymentPage, ctx)
+	if err != nil {
+		h.errorWorker.ServeJSONError(ctx, err)
+		return
+	}
+}
+
+func (h *handler) Stats(ctx *fasthttp.RequestCtx) {
+	paymentID, err := h.paymentTransport.StatsDecode(ctx)
+	if err != nil {
+		h.errorWorker.ServeJSONError(ctx, err)
+		return
+	}
+
+	stats, err := h.paymentService.Stats(paymentID)
+	if err != nil {
+		h.errorWorker.ServeJSONError(ctx, err)
+		return
+	}
+
+	err = h.paymentTransport.StatsEncode(ctx, stats)
 	if err != nil {
 		h.errorWorker.ServeJSONError(ctx, err)
 		return
