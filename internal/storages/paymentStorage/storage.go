@@ -132,19 +132,19 @@ func (s *storage) SelectPaids(paymentID int) (paids []models2.Paid, err error) {
 			if err != nil {
 				return
 			}
-			paids[i].BankCard = &bankCard
+			paids[i].Requisite.BankCard = &bankCard
 		case 2:
 			phonePayment, err := s.selectPhoneRequisite(paids[i].RequisiteID)
 			if err != nil {
 				return
 			}
-			paids[i].PhonePayment = &phonePayment
+			paids[i].Requisite.PhonePayment = &phonePayment
 		case 3:
 			youMoneyAccount, err := s.selectYouMoneyRequisite(paids[i].RequisiteID)
 			if err != nil {
 				return
 			}
-			paids[i].YouMoneyAccount = &youMoneyAccount
+			paids[i].Requisite.YouMoneyAccount = &youMoneyAccount
 		}
 	}
 	return

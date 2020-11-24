@@ -19,7 +19,7 @@ type Paid struct {
 	RequisiteID   int             `json:"-"`
 	PaidAt        time.Time       `json:"paidAt"`
 	Cost          decimal.Decimal `json:"cost"`
-	Requisite     `json:"requisite"`
+	Requisite     Requisite       `json:"requisite"`
 }
 
 type Requisite struct {
