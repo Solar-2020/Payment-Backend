@@ -37,6 +37,7 @@ type PhonePayment struct {
 type CardPayment struct {
 	BankName string `json:"bankName,omitempty"`
 	CardNumber string `json:"cardNumber,omitempty"`
+	BankLogo string `json:"bankLogo,omitempty"`
 	PhonePayment
 }
 

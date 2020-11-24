@@ -20,7 +20,7 @@ var paymentMethodsSchema = map[models.PaymentType]struct{
 }{
 	models.YoomoneyType: {"yoomoney_account", []string{"account_number"}},
 	models.PhoneType: {"phone_payment", []string{"phone_number"}},
-	models.CardType: {"bank_card", []string{"bank_title", "phone_number", "card_number"}},
+	models.CardType: {"bank_card", []string{"bank_title", "bank_logo", "phone_number", "card_number"}},
 }
 
 type storage struct {
@@ -176,7 +176,7 @@ func (s *storage) insertMethod(tx *sql.Tx, methods []models.PaymentMethod, payme
 		case models.YoomoneyType:
 			params = append(params, method.AccountNumber)
 		case models.CardType:
-			params = append(params, method.BankName, method.PhoneNumber, method.CardNumber)
+			params = append(params, method.BankName, method.BankLogo, method.PhoneNumber, method.CardNumber)
 		case models.PhoneType:
 			params = append(params, method.PhoneNumber)
 		default:
@@ -227,7 +227,7 @@ func (s *storage) selectMethods(paymentID int) (methods []models.PaymentMethod, 
 				tempMethod.Type = models.YoomoneyType
 			case models.CardType:
 				err = rows.Scan(&tempMethod.Owner, &tempMethod.PaymentID, &tempMethod.BankName,
-					&tempMethod.PhoneNumber, &tempMethod.CardNumber)
+					&tempMethod.BankLogo, &tempMethod.PhoneNumber, &tempMethod.CardNumber)
 				tempMethod.Type = models.CardType
 			case models.PhoneType:
 				err = rows.Scan(&tempMethod.Owner,&tempMethod.PaymentID, &tempMethod.PhoneNumber)
