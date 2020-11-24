@@ -11,10 +11,24 @@ type Stat struct {
 	Paid
 }
 
+type PaidCreate struct {
+	PostID        int             `json:"postID"`
+	GroupID       int             `json:"groupID"`
+	PaidID        int             `json:"paidID"`
+	PaymentID     int             `json:"paymentID"`
+	PayerID       int             `json:"-"`
+	Message       string          `json:"message"`
+	RequisiteType int             `json:"requisiteType"`
+	RequisiteID   int             `json:"-"`
+	PaidAt        time.Time       `json:"paidAt"`
+	Cost          decimal.Decimal `json:"cost"`
+}
+
 type Paid struct {
 	PaidID        int             `json:"paidID"`
 	PaymentID     int             `json:"paymentID"`
 	PayerID       int             `json:"-"`
+	Message       string          `json:"message"`
 	RequisiteType int             `json:"requisiteType"`
 	RequisiteID   int             `json:"-"`
 	PaidAt        time.Time       `json:"paidAt"`

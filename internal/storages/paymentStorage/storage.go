@@ -6,6 +6,7 @@ import (
 	"github.com/Solar-2020/Payment-Backend/pkg/models"
 	"strconv"
 	"strings"
+	"time"
 )
 
 const (
@@ -157,6 +158,15 @@ func (s *storage) selectBankRequisite(bankRequisiteID int) (bankCard models2.Ban
 	WHERE bc.id = $1;`
 
 	err = s.db.QueryRow(sqlQuery, bankRequisiteID).Scan(&bankCard.ID, &bankCard.BankTitle, &bankCard.PhoneNumber, &bankCard.CardNumber, &bankCard.Owner)
+	return
+}
+
+func (s *storage) InsertPaid(paidCreate models2.PaidCreate) (err error) {
+	const sqlQuery = `
+	INSERT INTO paid(group_id, post_id, payment_id, user_id, cost, message, paid_at, requisite_type_id, requisite_id)
+	VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`
+
+	_, err = s.db.Exec(sqlQuery, paidCreate.GroupID, paidCreate.PostID, paidCreate.PaymentID, paidCreate.PayerID, paidCreate.Cost, paidCreate.Message, time.Now(), paidCreate.RequisiteType, paidCreate.RequisiteID)
 	return
 }
 

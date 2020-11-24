@@ -12,6 +12,7 @@ type paymentService interface {
 	Create(createRequest models.CreateRequest) (createdPayments []models.Payment, err error)
 	GetByPostIDs(postIDs []int) (payments []models.Payment, err error)
 	Pay(pay payment.Pay) (paymentPage money.PaymentPage, err error)
+	Paid(paidCreate models2.PaidCreate) (err error)
 	Stats(paymentID int) (stats []models2.Stat, err error)
 }
 
@@ -27,6 +28,9 @@ type paymentTransport interface {
 
 	StatsDecode(ctx *fasthttp.RequestCtx) (paymentID int, err error)
 	StatsEncode(ctx *fasthttp.RequestCtx, stats []models2.Stat) (err error)
+
+	PaidDecode(ctx *fasthttp.RequestCtx) (paidCreate models2.PaidCreate, err error)
+	PaidEncode(ctx *fasthttp.RequestCtx) (err error)
 }
 
 type errorWorker interface {

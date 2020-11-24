@@ -8,6 +8,7 @@ type Handler interface {
 	Create(ctx *fasthttp.RequestCtx)
 	GetByPostIDs(ctx *fasthttp.RequestCtx)
 	Pay(ctx *fasthttp.RequestCtx)
+	Paid(ctx *fasthttp.RequestCtx)
 	Stats(ctx *fasthttp.RequestCtx)
 }
 
@@ -99,6 +100,26 @@ func (h *handler) Stats(ctx *fasthttp.RequestCtx) {
 	}
 
 	err = h.paymentTransport.StatsEncode(ctx, stats)
+	if err != nil {
+		h.errorWorker.ServeJSONError(ctx, err)
+		return
+	}
+}
+
+func (h *handler) Paid(ctx *fasthttp.RequestCtx) {
+	createPayment, err := h.paymentTransport.PaidDecode(ctx)
+	if err != nil {
+		h.errorWorker.ServeJSONError(ctx, err)
+		return
+	}
+
+	err = h.paymentService.Paid(createPayment)
+	if err != nil {
+		h.errorWorker.ServeJSONError(ctx, err)
+		return
+	}
+
+	err = h.paymentTransport.PaidEncode(ctx)
 	if err != nil {
 		h.errorWorker.ServeJSONError(ctx, err)
 		return

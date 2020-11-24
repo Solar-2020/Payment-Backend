@@ -127,3 +127,11 @@ func (s *service) Stats(paymentID int) (stats []models2.Stat, err error) {
 
 	return
 }
+
+func (s *service) Paid(paidCreate models2.PaidCreate) (err error) {
+	err = s.paymentStorage.InsertPaid(paidCreate)
+	if err != nil {
+		return s.errorWorker.NewError(fasthttp.StatusInternalServerError, nil, err)
+	}
+	return
+}

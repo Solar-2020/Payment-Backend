@@ -92,3 +92,19 @@ func (t transport) StatsEncode(ctx *fasthttp.RequestCtx, stats []models2.Stat) (
 	ctx.SetBody(body)
 	return
 }
+
+func (t transport) PaidDecode(ctx *fasthttp.RequestCtx) (paidCreate models2.PaidCreate, err error) {
+	userID := ctx.UserValue("userID").(int)
+	err = json.Unmarshal(ctx.Request.Body(), &paidCreate)
+	if err != nil {
+		return
+	}
+	paidCreate.PayerID = userID
+	return
+}
+
+func (t transport) PaidEncode(ctx *fasthttp.RequestCtx) (err error) {
+	ctx.Response.Header.SetContentType("application/json")
+	ctx.Response.Header.SetStatusCode(fasthttp.StatusOK)
+	return
+}

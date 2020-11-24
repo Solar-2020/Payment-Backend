@@ -22,6 +22,7 @@ type paymentStorage interface {
 	SelectPaymentsByPostID(postID int) (payments []models.Payment, err error)
 	SelectPayment(paymentID int) (payment models.Payment, err error)
 	SelectPaids(paymentID int) (paids []models2.Paid, err error)
+	InsertPaid(paidCreate models2.PaidCreate) (err error)
 }
 
 type moneyClient interface {
