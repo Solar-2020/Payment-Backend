@@ -248,7 +248,7 @@ func (s *storage) selectMethods(paymentID int) (methods []models.PaymentMethod, 
 
 func (s *storage) SelectPaids(paymentID int) (paids []models2.Paid, err error) {
 	const sqlQuery = `
-	SELECT p.id, p.user_id, p.cost, p.paid_at, p.requisite_type_id, p.requisite_id
+	SELECT p.id, p.payment_id, p.message, p.user_id, p.cost, p.paid_at, p.requisite_type_id, p.requisite_id
 	FROM paid AS p
 	WHERE p.payment_id = $1;`
 
@@ -259,7 +259,7 @@ func (s *storage) SelectPaids(paymentID int) (paids []models2.Paid, err error) {
 
 	for rows.Next() {
 		var tempPaid models2.Paid
-		err = rows.Scan(&tempPaid.PaidID, &tempPaid.PayerID, &tempPaid.Cost, &tempPaid.PaidAt, &tempPaid.RequisiteType, &tempPaid.RequisiteID)
+		err = rows.Scan(&tempPaid.PaidID, &tempPaid.PaymentID, &tempPaid.Message, &tempPaid.PayerID, &tempPaid.Cost, &tempPaid.PaidAt, &tempPaid.RequisiteType, &tempPaid.RequisiteID)
 		if err != nil {
 			return
 		}

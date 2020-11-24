@@ -7,20 +7,19 @@ import (
 )
 
 type Stat struct {
-	Payer account.User
+	Payer account.User `json:"payer"`
 	Paid
 }
 
 type PaidCreate struct {
 	PostID        int             `json:"postID"`
 	GroupID       int             `json:"groupID"`
-	PaidID        int             `json:"paidID"`
 	PaymentID     int             `json:"paymentID"`
 	PayerID       int             `json:"-"`
 	Message       string          `json:"message"`
 	RequisiteType int             `json:"requisiteType"`
-	RequisiteID   int             `json:"-"`
-	PaidAt        time.Time       `json:"paidAt"`
+	RequisiteID   int             `json:"requisiteID"`
+	PaidAt        time.Time       `json:"-"`
 	Cost          decimal.Decimal `json:"cost"`
 }
 
@@ -37,17 +36,17 @@ type Paid struct {
 }
 
 type Requisite struct {
-	*BankCard        `json:"bankCard,requisite"`
-	*YouMoneyAccount `json:"youMoneyAccount,requisite"`
-	*PhonePayment    `json:"phonePayment,requisite"`
+	*BankCard        `json:"bankCard,omitempty"`
+	*YouMoneyAccount `json:"youMoneyAccount,omitempty"`
+	*PhonePayment    `json:"phonePayment,omitempty"`
 }
 
 type BankCard struct {
-	ID          int    `json:"requisite"`
-	BankTitle   string `json:"requisite"`
-	PhoneNumber string `json:"requisite"`
-	CardNumber  string `json:"requisite"`
-	Owner       int    `json:"requisite"`
+	ID          int    `json:"id"`
+	BankTitle   string `json:"bankTitle"`
+	PhoneNumber string `json:"phoneNumber"`
+	CardNumber  string `json:"cardNumber"`
+	Owner       int    `json:"owner"`
 }
 
 type YouMoneyAccount struct {

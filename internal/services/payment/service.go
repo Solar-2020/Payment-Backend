@@ -114,7 +114,6 @@ func (s *service) Stats(paymentID int) (stats []models2.Stat, err error) {
 		return stats, s.errorWorker.NewError(fasthttp.StatusInternalServerError, nil, err)
 	}
 
-	stats = make([]models2.Stat, len(paids))
 	for _, paid := range paids {
 		var tempStat models2.Stat
 		tempStat.Paid = paid
