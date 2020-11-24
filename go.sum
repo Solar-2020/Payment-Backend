@@ -5,6 +5,7 @@ github.com/Solar-2020/Account-Backend v0.0.0-20201023232629-e612662ee390/go.mod 
 github.com/Solar-2020/Account-Backend v1.0.0/go.mod h1:dND8IFE9HL1bujKcRrINM0TD0CiuOni5yXV99Yb1ZBc=
 github.com/Solar-2020/Account-Backend v1.0.1 h1:M9R+CwOTdxskaiks+g6axquIOBj1X+agrbgt8kKkPnQ=
 github.com/Solar-2020/Account-Backend v1.0.1/go.mod h1:9CsLeMjhKBIgEyFHG1U62Qo2HKzudmZ12e2Mh3Sr/EI=
+github.com/Solar-2020/Account-Backend v1.0.5 h1:ngn9KjZFN7J5uoGb9GO8x0BhugMgOt4Ww5HBgfQZclE=
 github.com/Solar-2020/Account-Backend v1.0.5/go.mod h1:W1rYzIbPWIYefyg5NRK98xPCfEqkLpN/1SrZEajAqgw=
 github.com/Solar-2020/Authorization-Backend v1.0.0/go.mod h1:AAajUafxec6xymGXXkf/bofjxiL+GSrNqywK44YBEGE=
 github.com/Solar-2020/Authorization-Backend v1.0.1-0.20201030135138-435f31ab46e5/go.mod h1:xHQlnjw7HkHXsvzz/rnEcsiR03GfHDzS8yr4KIBW4B0=

@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	account "github.com/Solar-2020/Account-Backend/pkg/client"
 	auth "github.com/Solar-2020/Authorization-Backend/pkg/client"
 	"github.com/Solar-2020/GoUtils/http/errorWorker"
 	group "github.com/Solar-2020/Group-Backend/pkg/client"
@@ -45,6 +46,7 @@ func main() {
 		return
 	}
 
+	accountClient := account.NewClient(config.Config.AccountServiceHost, config.Config.ServerSecret)
 	groupClient := group.NewClient(config.Config.GroupServiceHost, config.Config.ServerSecret)
 
 	errorWorker := errorWorker.NewErrorWorker()
@@ -53,7 +55,7 @@ func main() {
 
 	paymentTransport := payment.NewTransport()
 
-	paymentService := payment.NewService(paymentStorage, moneyClient, groupClient, errorWorker)
+	paymentService := payment.NewService(paymentStorage, moneyClient, groupClient, accountClient, errorWorker)
 
 	paymentHandler := paymentHandler.NewHandler(paymentService, paymentTransport, errorWorker)
 

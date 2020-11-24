@@ -26,7 +26,7 @@ type paymentTransport interface {
 	PayEncode(paymentPage money.PaymentPage, ctx *fasthttp.RequestCtx) (err error)
 
 	StatsDecode(ctx *fasthttp.RequestCtx) (paymentID int, err error)
-	StatsEncode(ctx *fasthttp.RequestCtx, stat []models2.Stat) (err error)
+	StatsEncode(ctx *fasthttp.RequestCtx, stats []models2.Stat) (err error)
 }
 
 type errorWorker interface {
