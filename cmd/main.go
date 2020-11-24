@@ -59,7 +59,7 @@ func main() {
 
 	paymentHandler := paymentHandler.NewHandler(paymentService, paymentTransport, errorWorker)
 
-	authClient := auth.NewClient(config.Config.AuthServiceAddress, config.Config.ServerSecret)
+	authClient := auth.NewClient(config.Config.AuthServiceHost, config.Config.ServerSecret)
 
 	middlewares := middleware.NewMiddleware(&log, authClient)
 
