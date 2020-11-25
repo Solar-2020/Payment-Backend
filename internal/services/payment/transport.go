@@ -3,8 +3,10 @@ package payment
 import (
 	"encoding/json"
 	"github.com/Solar-2020/Payment-Backend/internal/clients/money"
-	payment "github.com/Solar-2020/Payment-Backend/internal/storages/paymentStorage"
+	models2 "github.com/Solar-2020/Payment-Backend/internal/models"
+	"github.com/Solar-2020/Payment-Backend/pkg/models"
 	"github.com/valyala/fasthttp"
+	"strconv"
 )
 
 type transport struct {
@@ -14,13 +16,13 @@ func NewTransport() *transport {
 	return &transport{}
 }
 
-func (t transport) CreateDecode(ctx *fasthttp.RequestCtx) (payments CreateRequest, err error) {
+func (t transport) CreateDecode(ctx *fasthttp.RequestCtx) (payments models.CreateRequest, err error) {
 	err = json.Unmarshal(ctx.Request.Body(), &payments)
 
 	return
 }
 
-func (t transport) CreateEncode(ctx *fasthttp.RequestCtx, payments []payment.Payment) (err error) {
+func (t transport) CreateEncode(ctx *fasthttp.RequestCtx, payments []models.Payment) (err error) {
 	body, err := json.Marshal(payments)
 	if err != nil {
 		return
@@ -43,7 +45,7 @@ func (t transport) GetByPostIDsDecode(ctx *fasthttp.RequestCtx) (postIDs []int, 
 	return ids.PostIDs, err
 }
 
-func (t transport) GetByPostIDsEncode(payments []payment.Payment, ctx *fasthttp.RequestCtx) (err error) {
+func (t transport) GetByPostIDsEncode(payments []models.Payment, ctx *fasthttp.RequestCtx) (err error) {
 	body, err := json.Marshal(payments)
 	if err != nil {
 		return
@@ -68,5 +70,41 @@ func (t transport) PayEncode(paymentPage money.PaymentPage, ctx *fasthttp.Reques
 	ctx.Response.Header.SetContentType("application/json")
 	ctx.Response.Header.SetStatusCode(fasthttp.StatusOK)
 	ctx.SetBody(body)
+	return
+}
+
+func (t transport) StatsDecode(ctx *fasthttp.RequestCtx) (paymentID int, err error) {
+	paymentIDStr := ctx.UserValue("paymentID").(string)
+	paymentID, err = strconv.Atoi(paymentIDStr)
+	if err != nil {
+		return
+	}
+	return
+}
+
+func (t transport) StatsEncode(ctx *fasthttp.RequestCtx, stats []models2.Stat) (err error) {
+	body, err := json.Marshal(stats)
+	if err != nil {
+		return
+	}
+	ctx.Response.Header.SetContentType("application/json")
+	ctx.Response.Header.SetStatusCode(fasthttp.StatusOK)
+	ctx.SetBody(body)
+	return
+}
+
+func (t transport) PaidDecode(ctx *fasthttp.RequestCtx) (paidCreate models2.PaidCreate, err error) {
+	userID := ctx.UserValue("userID").(int)
+	err = json.Unmarshal(ctx.Request.Body(), &paidCreate)
+	if err != nil {
+		return
+	}
+	paidCreate.PayerID = userID
+	return
+}
+
+func (t transport) PaidEncode(ctx *fasthttp.RequestCtx) (err error) {
+	ctx.Response.Header.SetContentType("application/json")
+	ctx.Response.Header.SetStatusCode(fasthttp.StatusOK)
 	return
 }
