@@ -46,7 +46,7 @@ type YoomoneyPayment struct {
 }
 
 type PaymentMethod struct {
-	ID int	`json:"id,omitempty"`
+	ID int	`json:"id"`
 	Owner int	`json:"owner"`
 	Type PaymentType `json:"type"`
 	PaymentID int `json:"-"`

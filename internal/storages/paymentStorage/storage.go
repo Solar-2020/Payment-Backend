@@ -208,7 +208,7 @@ func (s *storage) insertMethod(tx *sql.Tx, methods []models.PaymentMethod, payme
 }
 
 func (s *storage) selectMethods(paymentID int) (methods []models.PaymentMethod, err error) {
-	const sqlQueryTemplate = `SELECT owner, payment_id, %s FROM %s WHERE payment_id = $1`
+	const sqlQueryTemplate = `SELECT id, owner, payment_id, %s FROM %s WHERE payment_id = $1`
 
 	for payType, schema := range paymentMethodsSchema {
 		sqlQuery := fmt.Sprintf(sqlQueryTemplate,
@@ -224,14 +224,14 @@ func (s *storage) selectMethods(paymentID int) (methods []models.PaymentMethod, 
 			var tempMethod models.PaymentMethod
 			switch payType {
 			case models.YoomoneyType:
-				err = rows.Scan(&tempMethod.Owner, &tempMethod.PaymentID, &tempMethod.AccountNumber)
+				err = rows.Scan(&tempMethod.ID, &tempMethod.Owner,&tempMethod.PaymentID, &tempMethod.AccountNumber)
 				tempMethod.Type = models.YoomoneyType
 			case models.CardType:
-				err = rows.Scan(&tempMethod.Owner, &tempMethod.PaymentID, &tempMethod.BankName,
+				err = rows.Scan(&tempMethod.ID, &tempMethod.Owner, &tempMethod.PaymentID, &tempMethod.BankName,
 					&tempMethod.BankLogo, &tempMethod.PhoneNumber, &tempMethod.CardNumber)
 				tempMethod.Type = models.CardType
 			case models.PhoneType:
-				err = rows.Scan(&tempMethod.Owner, &tempMethod.PaymentID, &tempMethod.PhoneNumber)
+				err = rows.Scan(&tempMethod.ID, &tempMethod.Owner, &tempMethod.PaymentID, &tempMethod.PhoneNumber)
 				tempMethod.Type = models.PhoneType
 			default:
 				err = errors.New("bad payment type: " + string(payType))
