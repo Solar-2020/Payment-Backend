@@ -5,6 +5,7 @@ import (
 	"github.com/Solar-2020/Payment-Backend/internal/clients/money"
 	models2 "github.com/Solar-2020/Payment-Backend/internal/models"
 	"github.com/Solar-2020/Payment-Backend/pkg/models"
+	"github.com/pkg/errors"
 )
 
 const (
@@ -12,8 +13,11 @@ const (
 	CreatePaymentActionID = 10
 	EditPaymentActionID   = 11
 	DeletePaymentActionID = 12
+)
 
-	Error
+var (
+	ErrorYooMoneyAccountNotExit = errors.New("Аккаунт для оплаты не существует")
+	ErrorCantCreateYooMoneyPayment = errors.New("Не удалось создать платеж для YooMoney")
 )
 
 type paymentStorage interface {

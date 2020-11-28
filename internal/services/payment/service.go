@@ -68,7 +68,7 @@ func (s *service) GetByPostIDs(postIDs []int) (payments []models.Payment, err er
 func (s *service) Pay(pay Pay) (paymentPage money.PaymentPage, err error) {
 	payment, err := s.paymentStorage.SelectPayment(pay.PaymentID)
 	if err != nil {
-		return paymentPage, s.errorWorker.NewError(fasthttp.StatusInternalServerError, nil, err)
+		return paymentPage, s.errorWorker.NewError(fasthttp.StatusBadRequest, ErrorYooMoneyAccountNotExit, err)
 	}
 
 	yandexPayment := money.Payment{
@@ -79,7 +79,7 @@ func (s *service) Pay(pay Pay) (paymentPage money.PaymentPage, err error) {
 
 	requestID, err := s.moneyClient.CreatePayment(yandexPayment)
 	if err != nil {
-		return paymentPage, s.errorWorker.NewError(fasthttp.StatusInternalServerError, nil, err)
+		return paymentPage, s.errorWorker.NewError(fasthttp.StatusInternalServerError, ErrorCantCreateYooMoneyPayment, err)
 	}
 
 	paymentPage, err = s.moneyClient.CreatePaymentURL(requestID)
