@@ -2,6 +2,8 @@ package payment
 
 import (
 	"encoding/json"
+	"errors"
+	"github.com/Solar-2020/Payment-Backend/cmd/config"
 	"github.com/Solar-2020/Payment-Backend/internal/clients/money"
 	models2 "github.com/Solar-2020/Payment-Backend/internal/models"
 	"github.com/Solar-2020/Payment-Backend/pkg/models"
@@ -106,5 +108,22 @@ func (t transport) PaidDecode(ctx *fasthttp.RequestCtx) (paidCreate models2.Paid
 func (t transport) PaidEncode(ctx *fasthttp.RequestCtx) (err error) {
 	ctx.Response.Header.SetContentType("application/json")
 	ctx.Response.Header.SetStatusCode(fasthttp.StatusOK)
+	return
+}
+
+func (t transport) ConfirmYoomoneyDecode(ctx *fasthttp.RequestCtx) (token string, uid int, err error) {
+	uid = ctx.UserValue("userID").(int)
+	//token = ctx.UserValue("token").(string)
+	tokenBytes := ctx.QueryArgs().Peek("token")
+	if tokenBytes == nil {
+		err = errors.New("token: empty")
+		return
+	}
+	token = string(tokenBytes)
+	return
+}
+
+func (t transport) ConfirmYoomoneyEncode(ctx *fasthttp.RequestCtx) (err error) {
+	ctx.Redirect(config.Config.YoomoneyRedirectSuccess, fasthttp.StatusTemporaryRedirect)
 	return
 }

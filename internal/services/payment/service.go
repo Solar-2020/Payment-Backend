@@ -2,10 +2,13 @@ package payment
 
 import (
 	"database/sql"
+	"errors"
 	"github.com/Solar-2020/Payment-Backend/internal/clients/money"
 	models2 "github.com/Solar-2020/Payment-Backend/internal/models"
 	"github.com/Solar-2020/Payment-Backend/pkg/models"
+	"github.com/shopspring/decimal"
 	"github.com/valyala/fasthttp"
+	"time"
 )
 
 var (
@@ -132,5 +135,42 @@ func (s *service) Paid(paidCreate models2.PaidCreate) (err error) {
 	if err != nil {
 		return s.errorWorker.NewError(fasthttp.StatusInternalServerError, nil, err)
 	}
+	return
+}
+
+type PaymentToken struct {
+	UserID int
+	GroupID int
+	PostID int
+	PaymentID int
+	MethodID int
+	MethodType int
+	Value decimal.Decimal
+}
+
+func (s *service) ConfirmYoomoney(token string, user int) (err error) {
+	decoded, err := s.decodeYoomoneyResultToken(token, user)
+	if err != nil {
+		return s.errorWorker.NewError(fasthttp.StatusInternalServerError, errors.New("невалидный токен"), err)
+	}
+	paid := models2.PaidCreate{
+		PostID:        decoded.PostID,
+		GroupID:       decoded.GroupID,
+		PaymentID:     decoded.PaymentID,
+		PayerID:       user,
+		Message:       "",
+		RequisiteType: decoded.MethodType,
+		RequisiteID:   decoded.MethodID,
+		PaidAt:        time.Now(),
+		Cost:          decoded.Value,
+	}
+	err = s.paymentStorage.InsertPaid(paid)
+	if err != nil {
+		return s.errorWorker.NewError(fasthttp.StatusInternalServerError, errors.New("не удалось зафиксировать оплату"), err)
+	}
+	return
+}
+
+func (s *service) decodeYoomoneyResultToken(token string, user int) (result PaymentToken, err error) {
 	return
 }
