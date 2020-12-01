@@ -33,6 +33,7 @@ type moneyClient interface {
 	GetInstanceID() (instanceID string, err error)
 	CreatePayment(yandexPayment money.Payment) (requestID string, err error)
 	CreatePaymentURL(requestID string) (paymentPage money.PaymentPage, err error)
+	CreatePaymentURLWithSuccess(requestID, success string) (paymentPage money.PaymentPage, err error)
 }
 
 type groupClient interface {
@@ -50,4 +51,5 @@ type errorWorker interface {
 type Pay struct {
 	PaymentID int    `json:"paymentID"`
 	Message   string `json:"message"`
+	UserID    int
 }

@@ -60,7 +60,7 @@ func (t transport) GetByPostIDsEncode(payments []models.Payment, ctx *fasthttp.R
 
 func (t transport) PayDecode(ctx *fasthttp.RequestCtx) (pay Pay, err error) {
 	err = json.Unmarshal(ctx.Request.Body(), &pay)
-
+	pay.UserID = ctx.UserValue("userID").(int)
 	return
 }
 

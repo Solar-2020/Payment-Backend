@@ -29,13 +29,14 @@ jobs:
         env:
           DB_ROOT: ${{ secrets.DB_CONNECT_ROOT }}
           CLIENT_ID: ${{ secrets.MONEY_CLIENT_ID }}
+          JWT_PAYMENT_TOKEN_SECRET: ${{ secrets.JWT_PAYMENT_SECRET }}
         with:
-          envs: GITHUB_SHA, GITHUB_REF, SERVICE, DB_ROOT, CLIENT_ID
+          envs: GITHUB_SHA, GITHUB_REF, SERVICE, DB_ROOT, CLIENT_ID, JWT_PAYMENT_TOKEN_SECRET
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.PRIVATE_KEY }}
           script: sudo 
-            FACTER_image_tag=${GITHUB_SHA} FACTER_db_root=${DB_ROOT} FACTER_client_id=${CLIENT_ID} 
+            FACTER_image_tag=${GITHUB_SHA} FACTER_db_root=${DB_ROOT} FACTER_client_id=${CLIENT_ID} FACTER_jwt_payment_secret=${JWT_PAYMENT_TOKEN_SECRET}
             /opt/puppetlabs/bin/puppet apply -t --tags gobackend::${SERVICE}::${GITHUB_REF##*/} 
             /etc/puppetlabs/code/environments/production/manifests/site.pp; [[ "02" == *"${PIPESTATUS[0]}"* ]]
        

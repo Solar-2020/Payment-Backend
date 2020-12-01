@@ -3,8 +3,11 @@ package payment
 import (
 	"database/sql"
 	"errors"
+	"fmt"
+	"github.com/Solar-2020/Payment-Backend/cmd/config"
 	"github.com/Solar-2020/Payment-Backend/internal/clients/money"
 	models2 "github.com/Solar-2020/Payment-Backend/internal/models"
+	paymentToken "github.com/Solar-2020/Payment-Backend/internal/payment-token"
 	"github.com/Solar-2020/Payment-Backend/pkg/models"
 	"github.com/shopspring/decimal"
 	"github.com/valyala/fasthttp"
@@ -23,17 +26,21 @@ type service struct {
 	groupClient    groupClient
 	accountBackend accountBackend
 	errorWorker    errorWorker
+	tokenMaker 	   paymentToken.TokenMaker
 }
 
-func NewService(paymentStorage paymentStorage, moneyClient moneyClient, groupClient groupClient, accountBackend accountBackend, errorWorker errorWorker) *service {
+func NewService(paymentStorage paymentStorage, moneyClient moneyClient, groupClient groupClient,
+	accountBackend accountBackend, errorWorker errorWorker, tokenMaker paymentToken.TokenMaker) *service {
 	return &service{
 		paymentStorage: paymentStorage,
 		moneyClient:    moneyClient,
 		groupClient:    groupClient,
 		accountBackend: accountBackend,
 		errorWorker:    errorWorker,
+		tokenMaker:		tokenMaker,
 	}
 }
+
 
 func (s *service) Create(createRequest models.CreateRequest) (createdPayments []models.Payment, err error) {
 	if err = s.validateCreate(createRequest.Payments); err != nil {
@@ -85,7 +92,21 @@ func (s *service) Pay(pay Pay) (paymentPage money.PaymentPage, err error) {
 		return paymentPage, s.errorWorker.NewError(fasthttp.StatusInternalServerError, ErrorCantCreateYooMoneyPayment, err)
 	}
 
-	paymentPage, err = s.moneyClient.CreatePaymentURL(requestID)
+	token, err := s.tokenMaker.Create(paymentToken.TokenData{
+		UserID:         pay.UserID,
+		GroupID:        payment.GroupID,
+		PostID:         payment.PostID,
+		PaymentID:      pay.PaymentID,
+		MethodID:       0,
+		MethodType:     3,
+		Value:          payment.TotalCost,
+	})
+	if err != nil {
+		return
+	}
+
+	successLink := fmt.Sprintf("https://%s/api/payment/confirm?token=%s", config.Config.DomainName, token)
+	paymentPage, err = s.moneyClient.CreatePaymentURLWithSuccess(requestID, successLink)
 	if err != nil {
 		return paymentPage, s.errorWorker.NewError(fasthttp.StatusInternalServerError, nil, err)
 	}
@@ -149,7 +170,7 @@ type PaymentToken struct {
 }
 
 func (s *service) ConfirmYoomoney(token string, user int) (err error) {
-	decoded, err := s.decodeYoomoneyResultToken(token, user)
+	decoded, err :=s.tokenMaker.Parse(token)
 	if err != nil {
 		return s.errorWorker.NewError(fasthttp.StatusInternalServerError, errors.New("невалидный токен"), err)
 	}
@@ -168,9 +189,5 @@ func (s *service) ConfirmYoomoney(token string, user int) (err error) {
 	if err != nil {
 		return s.errorWorker.NewError(fasthttp.StatusInternalServerError, errors.New("не удалось зафиксировать оплату"), err)
 	}
-	return
-}
-
-func (s *service) decodeYoomoneyResultToken(token string, user int) (result PaymentToken, err error) {
 	return
 }

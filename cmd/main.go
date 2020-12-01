@@ -11,6 +11,7 @@ import (
 	"github.com/Solar-2020/Payment-Backend/cmd/handlers/middleware"
 	paymentHandler "github.com/Solar-2020/Payment-Backend/cmd/handlers/payment"
 	"github.com/Solar-2020/Payment-Backend/internal/clients/money"
+	paymentToken "github.com/Solar-2020/Payment-Backend/internal/payment-token"
 	"github.com/Solar-2020/Payment-Backend/internal/services/payment"
 	"github.com/Solar-2020/Payment-Backend/internal/storages/paymentStorage"
 	"github.com/kelseyhightower/envconfig"
@@ -20,6 +21,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 )
 
 func main() {
@@ -54,8 +56,10 @@ func main() {
 	paymentStorage := paymentStorage.NewStorage(postsDB)
 
 	paymentTransport := payment.NewTransport()
+	jwtTokenMaker := paymentToken.NewTokenMaker(config.Config.JWTPaymentTokenSecret,
+		time.Duration(config.Config.JWTPaymentTokenLifetime) * time.Second)
 
-	paymentService := payment.NewService(paymentStorage, moneyClient, groupClient, accountClient, errorWorker)
+	paymentService := payment.NewService(paymentStorage, moneyClient, groupClient, accountClient, errorWorker, jwtTokenMaker)
 
 	paymentHandler := paymentHandler.NewHandler(paymentService, paymentTransport, errorWorker)
 
