@@ -26,7 +26,12 @@ func (t *tokenMaker) Create(tokenData TokenData) (paymentToken string, err error
 	token := jwt.New(jwt.SigningMethodHS256)
 	claims := jwt.MapClaims{}
 	claims["UserID"] = tokenData.UserID
+	claims["GroupID"] = tokenData.GroupID
+	claims["PostID"] = tokenData.PostID
 	claims["PaymentID"] = tokenData.PaymentID
+	claims["MethodID"] = tokenData.MethodID
+	claims["MethodType"] = tokenData.MethodType
+	claims["Value"] = tokenData.Value
 	claims["Expire"] = time.Now().UTC().Add(t.defaultLifetime).Unix()
 
 	token.Claims = claims
@@ -35,7 +40,7 @@ func (t *tokenMaker) Create(tokenData TokenData) (paymentToken string, err error
 	return
 }
 
-func (t *tokenMaker)Parse(token string) (paymentToken TokenData, err error) {
+func (t *tokenMaker) Parse(token string) (paymentToken TokenData, err error) {
 	_, err = jwt.ParseWithClaims(token, &paymentToken, secret(t.secret))
 
 	return
