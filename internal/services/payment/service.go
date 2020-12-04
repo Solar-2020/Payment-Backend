@@ -186,15 +186,17 @@ type PaymentToken struct {
 	Value decimal.Decimal
 }
 
-func (s *service) ConfirmYoomoney(token string, user int) (err error) {
+func (s *service) ConfirmYoomoney(token string, user int) (redirectUrl string, err error) {
+	redirectUrl = config.Config.MoneyFailURL
 	tokenDecoded, err := url.QueryUnescape(token)
 	if err != nil {
-		return s.errorWorker.NewError(fasthttp.StatusInternalServerError, errors.New("невалидный токен"), err)
+		return redirectUrl, s.errorWorker.NewError(fasthttp.StatusInternalServerError, errors.New("невалидный токен"), err)
 	}
 	decoded, err :=s.tokenMaker.Parse(tokenDecoded)
 	if err != nil {
-		return s.errorWorker.NewError(fasthttp.StatusInternalServerError, errors.New("невалидный токен"), err)
+		return redirectUrl, s.errorWorker.NewError(fasthttp.StatusInternalServerError, errors.New("невалидный токен"), err)
 	}
+
 	paid := models2.PaidCreate{
 		PostID:        decoded.PostID,
 		GroupID:       decoded.GroupID,
@@ -208,7 +210,9 @@ func (s *service) ConfirmYoomoney(token string, user int) (err error) {
 	}
 	err = s.paymentStorage.InsertPaid(paid)
 	if err != nil {
-		return s.errorWorker.NewError(fasthttp.StatusInternalServerError, errors.New("не удалось зафиксировать оплату"), err)
+		return redirectUrl, s.errorWorker.NewError(fasthttp.StatusInternalServerError, errors.New("не удалось зафиксировать оплату"), err)
 	}
+
+	redirectUrl = fmt.Sprintf(config.Config.YoomoneyRedirectSuccess, strconv.Itoa(decoded.GroupID))
 	return
 }

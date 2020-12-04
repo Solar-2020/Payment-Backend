@@ -134,13 +134,13 @@ func (h *handler) ConfirmYoomoney(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	err = h.paymentService.ConfirmYoomoney(token, uid)
+	url, err := h.paymentService.ConfirmYoomoney(token, uid)
 	if err != nil {
 		h.errorWorker.ServeJSONError(ctx, err)
 		return
 	}
 
-	err = h.paymentTransport.ConfirmYoomoneyEncode(ctx)
+	err = h.paymentTransport.ConfirmYoomoneyEncode(ctx, url)
 	//if err != nil {
 	//	h.errorWorker.ServeJSONError(ctx, err)
 	//	return

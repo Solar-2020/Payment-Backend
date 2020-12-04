@@ -3,7 +3,6 @@ package payment
 import (
 	"encoding/json"
 	"errors"
-	"github.com/Solar-2020/Payment-Backend/cmd/config"
 	"github.com/Solar-2020/Payment-Backend/internal/clients/money"
 	models2 "github.com/Solar-2020/Payment-Backend/internal/models"
 	"github.com/Solar-2020/Payment-Backend/pkg/models"
@@ -123,7 +122,7 @@ func (t transport) ConfirmYoomoneyDecode(ctx *fasthttp.RequestCtx) (token string
 	return
 }
 
-func (t transport) ConfirmYoomoneyEncode(ctx *fasthttp.RequestCtx) (err error) {
-	ctx.Redirect(config.Config.YoomoneyRedirectSuccess, fasthttp.StatusTemporaryRedirect)
+func (t transport) ConfirmYoomoneyEncode(ctx *fasthttp.RequestCtx, redirectUrl string) (err error) {
+	ctx.Redirect(redirectUrl, fasthttp.StatusTemporaryRedirect)
 	return
 }

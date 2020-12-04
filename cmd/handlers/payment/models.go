@@ -14,7 +14,7 @@ type paymentService interface {
 	Pay(pay payment.Pay) (paymentPage money.PaymentPage, err error)
 	Paid(paidCreate models2.PaidCreate) (err error)
 	Stats(paymentID int) (stats []models2.Stat, err error)
-	ConfirmYoomoney(token string, user int) (err error)
+	ConfirmYoomoney(token string, user int) (redirectUrl string, err error)
 }
 
 type paymentTransport interface {
@@ -34,7 +34,7 @@ type paymentTransport interface {
 	PaidEncode(ctx *fasthttp.RequestCtx) (err error)
 
 	ConfirmYoomoneyDecode(ctx *fasthttp.RequestCtx) (token string, userID int, err error)
-	ConfirmYoomoneyEncode(ctx *fasthttp.RequestCtx) (err error)
+	ConfirmYoomoneyEncode(ctx *fasthttp.RequestCtx, redirectUrl string) (err error)
 }
 
 type errorWorker interface {
