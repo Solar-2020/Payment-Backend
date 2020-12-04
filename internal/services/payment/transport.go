@@ -3,6 +3,7 @@ package payment
 import (
 	"encoding/json"
 	"errors"
+	"github.com/Solar-2020/Payment-Backend/cmd/config"
 	"github.com/Solar-2020/Payment-Backend/internal/clients/money"
 	models2 "github.com/Solar-2020/Payment-Backend/internal/models"
 	"github.com/Solar-2020/Payment-Backend/pkg/models"
@@ -11,10 +12,11 @@ import (
 )
 
 type transport struct {
+	authClient authClient
 }
 
-func NewTransport() *transport {
-	return &transport{}
+func NewTransport(auth authClient) *transport {
+	return &transport{authClient:auth}
 }
 
 func (t transport) CreateDecode(ctx *fasthttp.RequestCtx) (payments models.CreateRequest, err error) {
@@ -124,5 +126,7 @@ func (t transport) ConfirmYoomoneyDecode(ctx *fasthttp.RequestCtx) (token string
 
 func (t transport) ConfirmYoomoneyEncode(ctx *fasthttp.RequestCtx, redirectUrl string) (err error) {
 	ctx.Redirect(redirectUrl, fasthttp.StatusTemporaryRedirect)
+	*ctx, err = t.authClient.AuthorizeRequest(string(ctx.Request.Header.Cookie("SessionToken")),
+		config.Config.YoomoneyRedirectCookieLifetime, *ctx)
 	return
 }

@@ -18,6 +18,7 @@ type config struct {
 	GroupServiceHost                string `envconfig:"GROUP_SERVICE_HOST" default:"develop.pay-together.ru"`
 	AccountServiceHost              string `envconfig:"ACCOUNT_SERVICE_HOST" default:"develop.pay-together.ru"`
 	YoomoneyRedirectSuccess			string `envconfig:"SUCCESS_PAYMENT_REDIRECT" default:"https://develop.pay-together.ru/group/%d"`
+	YoomoneyRedirectCookieLifetime  int	   `envconfig:"PAYMENT_REDIRECT_COOKIE_LIFETIEME" default:300"`
 
 	JWTPaymentTokenSecret			string	`envconfig:"JWT_PAYMENT_TOKEN_SECRET" required:"true"`
 	JWTPaymentTokenLifetime			int		`envconfig:"JWT_PAYMENT_TOKEN_LIFETIME" default:"600"`	// seconds

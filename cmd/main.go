@@ -50,20 +50,19 @@ func main() {
 
 	accountClient := account.NewClient(config.Config.AccountServiceHost, config.Config.ServerSecret)
 	groupClient := group.NewClient(config.Config.GroupServiceHost, config.Config.ServerSecret)
+	authClient := auth.NewClient(config.Config.AuthServiceHost, config.Config.ServerSecret)
 
 	errorWorker := errorWorker.NewErrorWorker()
 
 	paymentStorage := paymentStorage.NewStorage(postsDB)
 
-	paymentTransport := payment.NewTransport()
+	paymentTransport := payment.NewTransport(authClient)
 	jwtTokenMaker := paymentToken.NewTokenMaker(config.Config.JWTPaymentTokenSecret,
 		time.Duration(config.Config.JWTPaymentTokenLifetime) * time.Second)
 
 	paymentService := payment.NewService(paymentStorage, moneyClient, groupClient, accountClient, errorWorker, jwtTokenMaker)
 
 	paymentHandler := paymentHandler.NewHandler(paymentService, paymentTransport, errorWorker)
-
-	authClient := auth.NewClient(config.Config.AuthServiceHost, config.Config.ServerSecret)
 
 	middlewares := middleware.NewMiddleware(&log, authClient)
 

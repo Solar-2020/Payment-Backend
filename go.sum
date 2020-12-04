@@ -3,8 +3,9 @@ github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03
 github.com/Solar-2020/Account-Backend v1.0.7/go.mod h1:EKXodng5mxK6olvMw3xCgolKNcVaGXOcfSwa8PxFGBQ=
 github.com/Solar-2020/Account-Backend v1.0.9 h1:nAzDGGqtWimKcU/WaL+1XmFjzt37MdlKkdBxVFeGQk8=
 github.com/Solar-2020/Account-Backend v1.0.9/go.mod h1:EKXodng5mxK6olvMw3xCgolKNcVaGXOcfSwa8PxFGBQ=
-github.com/Solar-2020/Authorization-Backend v1.0.8 h1:wlSXEbR7uEavM5ogGUg6p++Rty8Ggc5yfaZ0fEdHyIk=
 github.com/Solar-2020/Authorization-Backend v1.0.8/go.mod h1:/BJGMLNhmkhViWTmOpvzlyAyzwUdcLUoatP9nxy8ZMw=
+github.com/Solar-2020/Authorization-Backend v1.0.10 h1:/jGBjdLplGi/N1B/r+tg1sMwLxIV5TbdBtyi9NQEY3U=
+github.com/Solar-2020/Authorization-Backend v1.0.10/go.mod h1:/BJGMLNhmkhViWTmOpvzlyAyzwUdcLUoatP9nxy8ZMw=
 github.com/Solar-2020/GoUtils v1.0.4 h1:h+SrNF38n56y/YITtAfDwAjpA2xT7xIkMnA3Er/fQb0=
 github.com/Solar-2020/GoUtils v1.0.4/go.mod h1:JgUyQ2m5+AxfNqe6/llRQGOxCeisBqBn/sp3Wt/elhU=
 github.com/Solar-2020/Group-Backend v1.0.5 h1:qD8mTNtPOsmAfZ0N46L/8MNsbafqRKjsqC/tQBsmVzs=
@@ -43,7 +44,6 @@ github.com/google/go-cmp v0.3.0/go.mod h1:8QqcDgzrUqlUb/G2PQTWiueGozuR1884gddMyw
 github.com/google/go-cmp v0.3.1/go.mod h1:8QqcDgzrUqlUb/G2PQTWiueGozuR1884gddMywk6iLU=
 github.com/google/go-cmp v0.4.0/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/gNBxE=
 github.com/google/go-cmp v0.5.0/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/gNBxE=
-github.com/google/go-cmp v0.5.2/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/gNBxE=
 github.com/google/uuid v1.1.2/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
 github.com/kelseyhightower/envconfig v1.4.0 h1:Im6hONhd3pLkfDFsbRgu68RDNkGF1r3dvMUtDTo2cv8=
 github.com/kelseyhightower/envconfig v1.4.0/go.mod h1:cccZRl6mQpaq41TPp5QxidR+Sa3axMbJDNb//FQX6Gg=
@@ -52,7 +52,6 @@ github.com/klauspost/compress v1.10.7/go.mod h1:aoV0uJVorq1K+umq18yTdKaF57EivdYs
 github.com/leodido/go-urn v1.2.0/go.mod h1:+8+nEpDfqqsY+g338gtMEUOtuK+4dEMhiQEgxpxOKII=
 github.com/lib/pq v1.8.0 h1:9xohqzkUwzR4Ga4ivdTcawVS89YSDVxXMa3xJX3cGzg=
 github.com/lib/pq v1.8.0/go.mod h1:AlVN5x4E4T544tWzH6hKfbfQvm3HdbOxrmggDNAPY9o=
-github.com/pkg/errors v0.8.1 h1:iURUrRGxPUNPdy5/HRSm+Yj6okJ6UtLINN0Q9M4+h3I=
 github.com/pkg/errors v0.8.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
 github.com/pkg/errors v0.9.1 h1:FEBLx1zS214owpjy7qsBeixbURkuhQAwrK5UwLGTwt4=
 github.com/pkg/errors v0.9.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=

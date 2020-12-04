@@ -6,6 +6,7 @@ import (
 	models2 "github.com/Solar-2020/Payment-Backend/internal/models"
 	"github.com/Solar-2020/Payment-Backend/pkg/models"
 	"github.com/pkg/errors"
+	"github.com/valyala/fasthttp"
 )
 
 const (
@@ -38,6 +39,10 @@ type moneyClient interface {
 
 type groupClient interface {
 	CheckPermission(userID, groupId, actionID int) (err error)
+}
+
+type authClient interface {
+	AuthorizeRequest(sessionToken string, lifetime int, req fasthttp.RequestCtx) (res fasthttp.RequestCtx, err error)
 }
 
 type accountBackend interface {

@@ -213,6 +213,6 @@ func (s *service) ConfirmYoomoney(token string, user int) (redirectUrl string, e
 		return redirectUrl, s.errorWorker.NewError(fasthttp.StatusInternalServerError, errors.New("не удалось зафиксировать оплату"), err)
 	}
 
-	redirectUrl = fmt.Sprintf(config.Config.YoomoneyRedirectSuccess, strconv.Itoa(decoded.GroupID))
+	redirectUrl = fmt.Sprintf(config.Config.YoomoneyRedirectSuccess, decoded.GroupID)
 	return
 }
