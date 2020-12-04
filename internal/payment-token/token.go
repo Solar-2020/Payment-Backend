@@ -35,7 +35,7 @@ func (t *tokenMaker) Create(tokenData TokenData) (paymentToken string, err error
 	claims["Expire"] = time.Now().UTC().Add(t.defaultLifetime).Unix()
 
 	token.Claims = claims
-	paymentToken, err = token.SignedString(t.secret)
+	paymentToken, err = token.SignedString([]byte(t.secret))
 
 	return
 }

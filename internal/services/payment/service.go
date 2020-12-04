@@ -11,6 +11,8 @@ import (
 	"github.com/Solar-2020/Payment-Backend/pkg/models"
 	"github.com/shopspring/decimal"
 	"github.com/valyala/fasthttp"
+	"net/url"
+	"strconv"
 	"time"
 )
 
@@ -81,8 +83,23 @@ func (s *service) Pay(pay Pay) (paymentPage money.PaymentPage, err error) {
 		return paymentPage, s.errorWorker.NewError(fasthttp.StatusBadRequest, ErrorYooMoneyAccountNotExit, err)
 	}
 
+	var yoomoneyRequisite models.PaymentMethod
+
+	for _, method := range payment.Methods {
+		if method.Type == models.YoomoneyType {
+			yoomoneyRequisite = method
+			break
+		}
+	}
+	if yoomoneyRequisite.ID == 0 {
+		err = s.errorWorker.NewError(fasthttp.StatusBadRequest,
+			fmt.Errorf("no yoomoney requisite found for payment " + strconv.Itoa(pay.PaymentID)),
+			err)
+		return
+	}
+
 	yandexPayment := money.Payment{
-		To:        payment.PaymentAccount,
+		To:        yoomoneyRequisite.AccountNumber,
 		AmountDue: payment.TotalCost,
 		Message:   pay.Message,
 	}
@@ -97,7 +114,7 @@ func (s *service) Pay(pay Pay) (paymentPage money.PaymentPage, err error) {
 		GroupID:        payment.GroupID,
 		PostID:         payment.PostID,
 		PaymentID:      pay.PaymentID,
-		MethodID:       0,
+		MethodID:      	yoomoneyRequisite.ID,
 		MethodType:     3,
 		Value:          payment.TotalCost,
 	})
@@ -105,7 +122,7 @@ func (s *service) Pay(pay Pay) (paymentPage money.PaymentPage, err error) {
 		return
 	}
 
-	successLink := fmt.Sprintf("https://%s/api/payment/confirm?token=%s", config.Config.DomainName, token)
+	successLink := fmt.Sprintf("https://%s/api/payment/confirm?token=%s", config.Config.DomainName, url.QueryEscape(token))
 	paymentPage, err = s.moneyClient.CreatePaymentURLWithSuccess(requestID, successLink)
 	if err != nil {
 		return paymentPage, s.errorWorker.NewError(fasthttp.StatusInternalServerError, nil, err)
@@ -170,7 +187,11 @@ type PaymentToken struct {
 }
 
 func (s *service) ConfirmYoomoney(token string, user int) (err error) {
-	decoded, err :=s.tokenMaker.Parse(token)
+	tokenDecoded, err := url.QueryUnescape(token)
+	if err != nil {
+		return s.errorWorker.NewError(fasthttp.StatusInternalServerError, errors.New("невалидный токен"), err)
+	}
+	decoded, err :=s.tokenMaker.Parse(tokenDecoded)
 	if err != nil {
 		return s.errorWorker.NewError(fasthttp.StatusInternalServerError, errors.New("невалидный токен"), err)
 	}
