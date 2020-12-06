@@ -118,6 +118,14 @@ func (c *client) CreatePayment(yandexPayment Payment) (requestID string, err err
 }
 
 func (c *client) CreatePaymentURL(requestID string) (paymentPage PaymentPage, err error) {
+	return c.CreatePaymentURLParametrized(requestID, c.successURL, c.failURL)
+}
+
+func (c *client) CreatePaymentURLWithSuccess(requestID string, successUrl string) (paymentPage PaymentPage, err error) {
+	return c.CreatePaymentURLParametrized(requestID, successUrl, c.failURL)
+}
+
+func (c *client) CreatePaymentURLParametrized(requestID string, successUrl, failUrl string) (paymentPage PaymentPage, err error) {
 	req := fasthttp.AcquireRequest()
 	resp := fasthttp.AcquireResponse()
 	defer fasthttp.ReleaseRequest(req)
@@ -133,8 +141,8 @@ func (c *client) CreatePaymentURL(requestID string) (paymentPage PaymentPage, er
 	data := url.Values{}
 	data.Set("request_id", requestID)
 	data.Set("instance_id", c.instanceID)
-	data.Set("ext_auth_success_uri", c.successURL)
-	data.Set("ext_auth_fail_uri", c.failURL)
+	data.Set("ext_auth_success_uri", successUrl)
+	data.Set("ext_auth_fail_uri", failUrl)
 	data.Set("request_token", "true")
 	req.SetBodyString(data.Encode())
 

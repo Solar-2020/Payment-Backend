@@ -5,6 +5,8 @@ import (
 	"github.com/Solar-2020/Payment-Backend/internal/clients/money"
 	models2 "github.com/Solar-2020/Payment-Backend/internal/models"
 	"github.com/Solar-2020/Payment-Backend/pkg/models"
+	"github.com/pkg/errors"
+	"github.com/valyala/fasthttp"
 )
 
 const (
@@ -12,8 +14,11 @@ const (
 	CreatePaymentActionID = 10
 	EditPaymentActionID   = 11
 	DeletePaymentActionID = 12
+)
 
-	Error
+var (
+	ErrorYooMoneyAccountNotExit = errors.New("Аккаунт для оплаты не существует")
+	ErrorCantCreateYooMoneyPayment = errors.New("Не удалось создать платеж для YooMoney")
 )
 
 type paymentStorage interface {
@@ -29,10 +34,15 @@ type moneyClient interface {
 	GetInstanceID() (instanceID string, err error)
 	CreatePayment(yandexPayment money.Payment) (requestID string, err error)
 	CreatePaymentURL(requestID string) (paymentPage money.PaymentPage, err error)
+	CreatePaymentURLWithSuccess(requestID, success string) (paymentPage money.PaymentPage, err error)
 }
 
 type groupClient interface {
 	CheckPermission(userID, groupId, actionID int) (err error)
+}
+
+type authClient interface {
+	AuthorizeRequest(sessionToken string, lifetime int, req fasthttp.RequestCtx) (res fasthttp.RequestCtx, err error)
 }
 
 type accountBackend interface {
@@ -46,4 +56,5 @@ type errorWorker interface {
 type Pay struct {
 	PaymentID int    `json:"paymentID"`
 	Message   string `json:"message"`
+	UserID    int
 }

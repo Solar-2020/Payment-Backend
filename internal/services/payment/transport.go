@@ -2,6 +2,8 @@ package payment
 
 import (
 	"encoding/json"
+	"errors"
+	"github.com/Solar-2020/Payment-Backend/cmd/config"
 	"github.com/Solar-2020/Payment-Backend/internal/clients/money"
 	models2 "github.com/Solar-2020/Payment-Backend/internal/models"
 	"github.com/Solar-2020/Payment-Backend/pkg/models"
@@ -10,10 +12,11 @@ import (
 )
 
 type transport struct {
+	authClient authClient
 }
 
-func NewTransport() *transport {
-	return &transport{}
+func NewTransport(auth authClient) *transport {
+	return &transport{authClient:auth}
 }
 
 func (t transport) CreateDecode(ctx *fasthttp.RequestCtx) (payments models.CreateRequest, err error) {
@@ -58,7 +61,7 @@ func (t transport) GetByPostIDsEncode(payments []models.Payment, ctx *fasthttp.R
 
 func (t transport) PayDecode(ctx *fasthttp.RequestCtx) (pay Pay, err error) {
 	err = json.Unmarshal(ctx.Request.Body(), &pay)
-
+	pay.UserID = ctx.UserValue("userID").(int)
 	return
 }
 
@@ -106,5 +109,24 @@ func (t transport) PaidDecode(ctx *fasthttp.RequestCtx) (paidCreate models2.Paid
 func (t transport) PaidEncode(ctx *fasthttp.RequestCtx) (err error) {
 	ctx.Response.Header.SetContentType("application/json")
 	ctx.Response.Header.SetStatusCode(fasthttp.StatusOK)
+	return
+}
+
+func (t transport) ConfirmYoomoneyDecode(ctx *fasthttp.RequestCtx) (token string, uid int, err error) {
+	uid = ctx.UserValue("userID").(int)
+	//token = ctx.UserValue("token").(string)
+	tokenBytes := ctx.QueryArgs().Peek("token")
+	if tokenBytes == nil {
+		err = errors.New("token: empty")
+		return
+	}
+	token = string(tokenBytes)
+	return
+}
+
+func (t transport) ConfirmYoomoneyEncode(ctx *fasthttp.RequestCtx, redirectUrl string) (err error) {
+	ctx.Redirect(redirectUrl, fasthttp.StatusTemporaryRedirect)
+	*ctx, err = t.authClient.AuthorizeRequest(string(ctx.Request.Header.Cookie("SessionToken")),
+		config.Config.YoomoneyRedirectCookieLifetime, *ctx)
 	return
 }

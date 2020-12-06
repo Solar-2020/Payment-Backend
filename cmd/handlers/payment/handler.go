@@ -10,6 +10,7 @@ type Handler interface {
 	Pay(ctx *fasthttp.RequestCtx)
 	Paid(ctx *fasthttp.RequestCtx)
 	Stats(ctx *fasthttp.RequestCtx)
+	ConfirmYoomoney(ctx *fasthttp.RequestCtx)
 }
 
 type handler struct {
@@ -124,4 +125,25 @@ func (h *handler) Paid(ctx *fasthttp.RequestCtx) {
 		h.errorWorker.ServeJSONError(ctx, err)
 		return
 	}
+}
+
+func (h *handler) ConfirmYoomoney(ctx *fasthttp.RequestCtx) {
+	token, uid, err := h.paymentTransport.ConfirmYoomoneyDecode(ctx)
+	if err != nil {
+		h.errorWorker.ServeJSONError(ctx, err)
+		return
+	}
+
+	url, err := h.paymentService.ConfirmYoomoney(token, uid)
+	if err != nil {
+		h.errorWorker.ServeJSONError(ctx, err)
+		return
+	}
+
+	err = h.paymentTransport.ConfirmYoomoneyEncode(ctx, url)
+	//if err != nil {
+	//	h.errorWorker.ServeJSONError(ctx, err)
+	//	return
+	//}
+	return
 }
