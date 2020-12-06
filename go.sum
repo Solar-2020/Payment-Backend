@@ -8,6 +8,7 @@ github.com/Solar-2020/Authorization-Backend v1.0.10 h1:/jGBjdLplGi/N1B/r+tg1sMwL
 github.com/Solar-2020/Authorization-Backend v1.0.10/go.mod h1:/BJGMLNhmkhViWTmOpvzlyAyzwUdcLUoatP9nxy8ZMw=
 github.com/Solar-2020/GoUtils v1.0.4 h1:h+SrNF38n56y/YITtAfDwAjpA2xT7xIkMnA3Er/fQb0=
 github.com/Solar-2020/GoUtils v1.0.4/go.mod h1:JgUyQ2m5+AxfNqe6/llRQGOxCeisBqBn/sp3Wt/elhU=
+github.com/Solar-2020/GoUtils v1.0.5/go.mod h1:JgUyQ2m5+AxfNqe6/llRQGOxCeisBqBn/sp3Wt/elhU=
 github.com/Solar-2020/Group-Backend v1.0.5 h1:qD8mTNtPOsmAfZ0N46L/8MNsbafqRKjsqC/tQBsmVzs=
 github.com/Solar-2020/Group-Backend v1.0.5/go.mod h1:HK/AtHJkYZFbHETabar+DinJrtpKRq/ZgJAk6Pqzwh0=
 github.com/andybalholm/brotli v1.0.0 h1:7UCwP93aiSfvWpapti8g88vVVGp2qqtGyePsSuDafo4=
