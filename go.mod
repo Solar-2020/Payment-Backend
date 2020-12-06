@@ -5,7 +5,7 @@ go 1.14
 require (
 	github.com/Solar-2020/Account-Backend v1.0.9
 	github.com/Solar-2020/Authorization-Backend v1.0.10
-	github.com/Solar-2020/GoUtils v1.0.4
+	github.com/Solar-2020/GoUtils v1.0.5
 	github.com/Solar-2020/Group-Backend v1.0.5
 	github.com/buaazp/fasthttprouter v0.1.1
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
